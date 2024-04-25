@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,13 +33,14 @@ public class DaoLicenseServiceImpl implements LicenseService {
 
     @Override
     public List<String> getUserLicenses(long userId) {
-        return null;
+        return licenseRepo.findLicenseModelsByHolder(userId)
+                .stream().map(LicenseModel::getLicense).toList();
     }
 
     @Override
     public Optional<String> getUsersLicenseForProduct(long userId, long productId) {
-
-        return Optional.empty();
+        Optional<LicenseModel> license = licenseRepo.findLicenseModelByHolderAndProductId(userId, productId);
+        return license.map(LicenseModel::getLicense);
     }
 
     @Override
@@ -61,12 +63,38 @@ public class DaoLicenseServiceImpl implements LicenseService {
 
     @Override
     public void activateLicense(long userId, String license) throws LicenseServiceException {
+        Objects.requireNonNull(license);
+
         Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
         if (licenseModel.isEmpty())
-            throw new LicenseServiceException("License could not be found", userId);
+            throw new LicenseServiceException("License could not be found", -1);
+
+        Optional<LicenseModel> checkForDupes = licenseRepo.findLicenseModelByHolderAndProductId(
+                userId, licenseModel.get().getProductId());
+        if (checkForDupes.isPresent())
+            throw new LicenseServiceException("You already own this product", licenseModel.get().getId());
 
         licenseModel.get().setHolder(userId);
         licenseRepo.saveAndFlush(licenseModel.get());
+    }
+
+    @Override
+    public void deactivateLicense(long userId, long productId) throws LicenseServiceException {
+        Optional<LicenseModel> license = licenseRepo.findLicenseModelByHolderAndProductId(userId, productId);
+        if (license.isEmpty())
+            throw new LicenseServiceException("You do not own this product", productId);
+
+        license.get().setHolder(null);
+        licenseRepo.saveAndFlush(license.get());
+    }
+
+    @Override
+    public void deleteLicense(String license) throws LicenseServiceException {
+        Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
+        if (licenseModel.isEmpty())
+            throw new LicenseServiceException("License does not exist", -1);
+
+        licenseRepo.delete(licenseModel.get());
     }
 
 }

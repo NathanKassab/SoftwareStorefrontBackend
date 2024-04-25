@@ -50,4 +50,21 @@ public interface LicenseService {
     @Secured("PRIV_ACTIVATE_LICENSE")
     void activateLicense(long userId, String license) throws LicenseServiceException;
 
+    /**
+     * Deactivates a license key
+     * @param userId The holder's id
+     * @param productId The product's id
+     * @throws LicenseServiceException If something goes wrong while deactivating the license
+     */
+    @Secured("PRIV_DEACTIVATE_LICENSE")
+    void deactivateLicense(long userId, long productId) throws LicenseServiceException;
+
+    /**
+     * Deletes a license key
+     * @param license The license to delete
+     * @throws LicenseServiceException If something goes wrong while deleting the license
+     */
+    @Secured("PRIV_DELETE_LICENSE")
+    void deleteLicense(String license) throws LicenseServiceException;
+
 }

@@ -1,12 +1,11 @@
 package me.bannock.capstone.backend.licensing.service.db;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -37,7 +36,7 @@ public class LicenseModel {
     private long productId;
 
     @Column(name = "holder")
-    private long holder;
+    private Long holder;
 
     public Long getId() {
         return id;
@@ -59,11 +58,11 @@ public class LicenseModel {
         this.productId = productId;
     }
 
-    public long getHolder() {
+    public Long getHolder() {
         return holder;
     }
 
-    public void setHolder(long holder) {
+    public void setHolder(@Nullable Long holder) {
         this.holder = holder;
     }
 
