@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+
+<form method="POST" th:action="@{/processLogin}">
+    <label for="email">Email</label><input type="text" name="email" id="email">
+    <label for="password">Password</label><input type="password" name="password" id="password">
+    <input type="submit">
+</form>
+
+</body>
+</html>
