@@ -7,11 +7,14 @@ import java.util.Collection;
 public class AccountDTO {
 
     public AccountDTO(long uid, Collection<? extends GrantedAuthority> authorities,
-                      String username, String password, boolean expired,
-                      boolean passwordExpired, boolean locked, boolean disabled){
+                      String email, String username,
+                      String password, boolean expired,
+                      boolean passwordExpired, boolean locked,
+                      boolean disabled){
         this.uid = uid;
         this.authorities = authorities;
         this.password = password;
+        this.email = email;
         this.username = username;
         this.expired = expired;
         this.passwordExpired = passwordExpired;
@@ -21,8 +24,9 @@ public class AccountDTO {
 
     private final long uid;
     private final Collection<? extends GrantedAuthority> authorities;
-    private final String password;
+    private final String email;
     private final String username;
+    private final String password;
     private final boolean expired, passwordExpired, locked, disabled;
 
     public long getUid() {
@@ -33,12 +37,16 @@ public class AccountDTO {
         return authorities;
     }
 
-    public String getPassword() {
-        return password;
+    public String getEmail() {
+        return email;
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public boolean isExpired() {
@@ -62,13 +70,13 @@ public class AccountDTO {
         return "AccountDTO{" +
                 "uid=" + uid +
                 ", authorities=" + authorities +
-                ", password=***''" +
+                ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
+                ", password='***'" +
                 ", expired=" + expired +
                 ", passwordExpired=" + passwordExpired +
                 ", locked=" + locked +
                 ", disabled=" + disabled +
                 '}';
     }
-
 }

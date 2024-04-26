@@ -14,6 +14,14 @@ public interface UserService {
     long login(String email, String password) throws UserServiceException;
 
     /**
+     * Logs into a user account using their api token
+     * @param key The token sent alongside the request
+     * @return The user's id
+     * @throws UserServiceException If something goes wrong while logging into the account
+     */
+    long loginWithApiKey(String key) throws UserServiceException;
+
+    /**
      * Registers a new account
      * @param email The new account's email
      * @param username The new account's username
@@ -46,9 +54,15 @@ public interface UserService {
 
     /**
      * @param email The email to locate account with
-     * @return The account data, if it could be found
+     * @return The account's data, if it could be found
      */
     Optional<AccountDTO> getAccountWithEmail(String email);
+
+    /**
+     * @param uid The uid of the account you want to locate
+     * @return The account's data, if it could be found
+     */
+    Optional<AccountDTO> getAccountWithUid(long uid);
 
     /**
      * Gets an account with their uid

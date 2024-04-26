@@ -2,9 +2,13 @@ package me.bannock.capstone.backend.licensing.service;
 
 import jakarta.annotation.Nullable;
 
+import java.util.Objects;
+
 public class LicenseDTO {
 
     public LicenseDTO(long id, @Nullable Long holderId, long productId, String license){
+        Objects.requireNonNull(license);
+
         this.id = id;
         this.holderId = id;
         this.productId = productId;
@@ -15,7 +19,7 @@ public class LicenseDTO {
 
     private Long holderId;
 
-    private Long productId;
+    private long productId;
 
     private String license;
 

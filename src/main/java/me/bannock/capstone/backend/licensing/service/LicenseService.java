@@ -67,4 +67,11 @@ public interface LicenseService {
     @Secured("PRIV_DELETE_LICENSE")
     void deleteLicense(String license) throws LicenseServiceException;
 
+    /**
+     * Gets a license object with its code
+     * @param license The license code
+     * @return The license, if it could be found
+     */
+    Optional<LicenseDTO> getLicense(String license);
+
 }

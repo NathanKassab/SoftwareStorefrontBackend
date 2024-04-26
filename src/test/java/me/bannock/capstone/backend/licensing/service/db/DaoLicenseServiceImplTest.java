@@ -70,6 +70,7 @@ class DaoLicenseServiceImplTest {
             licenseService.activateLicense(TEST_OWNER_ID, license);
             assertThrows(LicenseServiceException.class,
                     () -> licenseService.activateLicense(TEST_OWNER_ID, license));
+            assertTrue(licenseService.getLicense(license).isPresent());
         });
     }
 

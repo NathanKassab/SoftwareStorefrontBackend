@@ -19,11 +19,18 @@ public class LoggingAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        logger.info("User was not authorized to access resource, session={}, endpoint={}, user={}, error={}",
-                request.getRequestedSessionId(),
-                request.getRequestURI(),
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-                accessDeniedException.toString());
+        if (SecurityContextHolder.getContext().getAuthentication() == null){
+            logger.info("User was not authenticated and could not access resource, session={}, endpoint={}, error={}",
+                    request.getRequestedSessionId(),
+                    request.getRequestURI(),
+                    accessDeniedException);
+        }else{
+            logger.info("User was not authorized to access resource, session={}, endpoint={}, user={}, error={}",
+                    request.getRequestedSessionId(),
+                    request.getRequestURI(),
+                    SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+                    accessDeniedException);
+        }
         response.sendRedirect("/403.html");
     }
 

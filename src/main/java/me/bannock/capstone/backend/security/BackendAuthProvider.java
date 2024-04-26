@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -20,8 +19,7 @@ import java.util.Optional;
 public class BackendAuthProvider implements AuthenticationProvider {
 
     @Autowired
-    public BackendAuthProvider(UserService userService, PasswordEncoder passwordEncoder,
-                               UserDetailsService userDetailsService){
+    public BackendAuthProvider(UserService userService, UserDetailsService userDetailsService){
         this.userService = userService;
         this.userDetailsService = userDetailsService;
     }
@@ -54,7 +52,7 @@ public class BackendAuthProvider implements AuthenticationProvider {
         }
 
         if (!userDetails.isEnabled()){
-            logger.info("Logged out user due to account being disabled, userDetails={}", userDetails);
+            logger.info("Denied user login due to account being disabled, userDetails={}", userDetails);
             throw new BadCredentialsException("account is disabled");
         }
 

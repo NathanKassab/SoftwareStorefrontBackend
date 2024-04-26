@@ -1,8 +1,9 @@
 package me.bannock.capstone.backend.licensing.service.db;
 
+import me.bannock.capstone.backend.licensing.service.LicenseDTO;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
-import me.bannock.capstone.backend.licensing.service.keygen.KeyGenService;
+import me.bannock.capstone.backend.keygen.KeyGenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,21 @@ public class DaoLicenseServiceImpl implements LicenseService {
             throw new LicenseServiceException("License does not exist", -1);
 
         licenseRepo.delete(licenseModel.get());
+    }
+
+    @Override
+    public Optional<LicenseDTO> getLicense(String license) {
+        return licenseRepo.findLicenseModelByLicense(license).map(this::mapToDto);
+    }
+
+    /**
+     * Maps a model to a DTO
+     * @param model The model to map
+     * @return The DTO equivalent
+     */
+    private LicenseDTO mapToDto(LicenseModel model){
+        return new LicenseDTO(model.getId(), model.getHolder(),
+                model.getProductId(), model.getLicense());
     }
 
 }

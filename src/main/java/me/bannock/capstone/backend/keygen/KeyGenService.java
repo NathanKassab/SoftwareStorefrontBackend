@@ -1,4 +1,4 @@
-package me.bannock.capstone.backend.licensing.service.keygen;
+package me.bannock.capstone.backend.keygen;
 
 public interface KeyGenService {
 

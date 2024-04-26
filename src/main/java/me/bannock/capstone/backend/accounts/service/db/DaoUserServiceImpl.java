@@ -3,6 +3,7 @@ package me.bannock.capstone.backend.accounts.service.db;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.accounts.service.UserServiceException;
+import me.bannock.capstone.backend.keygen.KeyGenService;
 import me.bannock.capstone.backend.security.Privilege;
 import me.bannock.capstone.backend.security.Role;
 import org.apache.logging.log4j.LogManager;
@@ -24,14 +25,17 @@ import java.util.stream.Collectors;
 public class DaoUserServiceImpl implements UserService {
 
     @Autowired
-    public DaoUserServiceImpl(PasswordEncoder passwordEncoder, UserRepo userRepo){
+    public DaoUserServiceImpl(PasswordEncoder passwordEncoder, UserRepo userRepo,
+                              KeyGenService keyGenService){
         this.passwordEncoder = passwordEncoder;
         this.userRepo = userRepo;
+        this.keyGenService = keyGenService;
     }
 
     private final Logger logger = LogManager.getLogger();
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
+    private final KeyGenService keyGenService;
 
     @Value("${backend.userService.maxGenApiKeyTries}")
     private int MAX_GEN_API_KEY_TRIES;
@@ -48,6 +52,21 @@ public class DaoUserServiceImpl implements UserService {
             throw new UserServiceException("Could not find user account what matched email", -1);
         if (!passwordEncoder.matches(password, user.get().getPassword()))
             throw new UserServiceException("Password is incorrect", user.get().getId());
+        return user.get().getId();
+    }
+
+    @Override
+    public long loginWithApiKey(String token) throws UserServiceException {
+        Objects.requireNonNull(token);
+
+        Optional<AccountModel> user = userRepo.findAccountModelByApiKey(token);
+        if (user.isEmpty())
+            throw new UserServiceException("Api key does not exist", -1);
+
+        // Double check that the user is allowed to use the api for logins
+        if (user.get().getPrivileges().stream().noneMatch(priv -> priv.equals(Privilege.PRIV_USE_API.getPrivilege())))
+            throw new UserServiceException("Privilege \"PRIV_USE_API\" is needed to authenticate through api", user.get().getId());
+
         return user.get().getId();
     }
 
@@ -88,7 +107,7 @@ public class DaoUserServiceImpl implements UserService {
         String newApiKey;
         int attemptedTries = 0;
         do{
-            newApiKey = UUID.randomUUID().toString();
+            newApiKey = this.keyGenService.generateNewKey();
             if (attemptedTries++ >= MAX_GEN_API_KEY_TRIES)
                 throw new RuntimeException("Couldn't generate a unique api key");
         }while (userRepo.existsByApiKey(newApiKey));
@@ -116,18 +135,13 @@ public class DaoUserServiceImpl implements UserService {
         Objects.requireNonNull(email);
 
         Optional<AccountModel> userOptional = userRepo.findAccountModelByEmail(email);
-        if (userOptional.isEmpty())
-            return Optional.empty();
-        AccountModel user = userOptional.get();
-        return Optional.of(new AccountDTO(
-                user.getId(),
-                user.getPrivileges().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()),
-                user.getUsername(),
-                user.getPassword(),
-                !user.isEmailVerified(),
-                false, false,
-                user.isDisabled()
-        ));
+        return userOptional.map(this::createDto);
+    }
+
+    @Override
+    public Optional<AccountDTO> getAccountWithUid(long uid) {
+        Optional<AccountModel> user = userRepo.findAccountModelById(uid);
+        return user.map(this::createDto);
     }
 
     @Override
@@ -185,6 +199,25 @@ public class DaoUserServiceImpl implements UserService {
         if (privileges == null)
             return false;
         return privileges.contains(privilegeName);
+    }
+
+    /**
+     * Creates a DTO object with a model object
+     * @param user The account model object
+     * @return An account DTO
+     */
+    private AccountDTO createDto(AccountModel user){
+        Objects.requireNonNull(user);
+        return new AccountDTO(
+                user.getId(),
+                user.getPrivileges().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()),
+                user.getEmail(),
+                user.getUsername(),
+                user.getPassword(),
+                !user.isEmailVerified(),
+                false, false,
+                user.isDisabled()
+        );
     }
 
 }

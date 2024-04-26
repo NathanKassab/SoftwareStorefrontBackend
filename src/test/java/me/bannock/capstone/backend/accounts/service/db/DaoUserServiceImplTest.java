@@ -1,7 +1,6 @@
 package me.bannock.capstone.backend.accounts.service.db;
 
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
-import me.bannock.capstone.backend.accounts.service.db.DaoUserServiceImpl;
 import me.bannock.capstone.backend.security.Privilege;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class DaoUserServiceImplTest {
@@ -18,6 +22,12 @@ class DaoUserServiceImplTest {
     private DaoUserServiceImpl userService;
 
     private final String DEFAULT_TEST_PASSWORD = "test";
+
+    @Test
+    void getAccountDtoWithUid() throws Exception {
+        Long uid = registerAndLogin();
+        assertTrue(userService.getAccountWithUid(uid).isPresent());
+    }
 
     @Test
     void registerAndLoginTest() throws Exception{
@@ -38,6 +48,8 @@ class DaoUserServiceImplTest {
         Optional<String> fetchedApiKey  = userService.getApiKey(userId);
         assertTrue(fetchedApiKey.isPresent());
         assertEquals(apiKey, fetchedApiKey.get());
+
+        assertDoesNotThrow(() -> userService.loginWithApiKey(fetchedApiKey.get()));
     }
 
     @Test

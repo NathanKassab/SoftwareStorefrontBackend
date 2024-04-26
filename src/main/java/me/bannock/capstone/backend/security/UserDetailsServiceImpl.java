@@ -1,4 +1,4 @@
-package me.bannock.capstone.backend.accounts.security;
+package me.bannock.capstone.backend.security;
 
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.AccountUserDetails;
