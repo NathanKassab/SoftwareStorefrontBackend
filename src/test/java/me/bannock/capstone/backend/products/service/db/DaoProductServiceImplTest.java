@@ -1,5 +1,7 @@
-package me.bannock.capstone.backend.products.service;
+package me.bannock.capstone.backend.products.service.db;
 
+import me.bannock.capstone.backend.products.service.ProductDTO;
+import me.bannock.capstone.backend.products.service.ProductServiceException;
 import me.bannock.capstone.backend.products.service.db.DaoProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

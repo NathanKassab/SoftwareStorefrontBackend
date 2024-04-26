@@ -1,5 +1,6 @@
-package me.bannock.capstone.backend.accounts.service;
+package me.bannock.capstone.backend.accounts.service.db;
 
+import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.db.DaoUserServiceImpl;
 import me.bannock.capstone.backend.security.Privilege;
 import org.junit.jupiter.api.Test;
