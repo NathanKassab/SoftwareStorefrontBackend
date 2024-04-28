@@ -52,6 +52,9 @@ public class DaoProductServiceImpl implements ProductService {
     @Value("${backend.productService.maxProductPurchaseUrlLength}")
     private int maxProductPurchaseUrlLength;
 
+    @Value("${backend.productService.maxKeygenIdLength}")
+    private int maxKeygenIdLength;
+
     @Override
     public Optional<ProductDTO> getProductDetails(long productId) throws ProductServiceException {
         Optional<ProductModel> product = productRepo.findById(productId);
@@ -83,6 +86,10 @@ public class DaoProductServiceImpl implements ProductService {
             throw new ProductServiceException(
                     "Purchase URL cannot exceed %s characters".formatted(maxProductPurchaseUrlLength), productDetails);
 
+        if (productDetails.getKeygenId().length() > maxKeygenIdLength)
+            throw new ProductServiceException(
+                    "Keygen ID cannot exceed %s characters".formatted(maxKeygenIdLength), productDetails);
+
         mergeIntoModel(product.get(), productDetails);
         productRepo.saveAndFlush(product.get());
     }
@@ -95,6 +102,7 @@ public class DaoProductServiceImpl implements ProductService {
                 defaultProductDescription,
                 defaultProductIconUrl,
                 defaultProductPurchaseUrl,
+                "",
                 defaultProductPrice
         );
         productRepo.saveAndFlush(product);
@@ -119,6 +127,7 @@ public class DaoProductServiceImpl implements ProductService {
                 model.getIconUrl(),
                 model.getPurchaseUrl(),
                 model.getDescription(),
+                model.getKeygenId(),
                 model.getOwnerUid(),
                 model.isDisabled(),
                 model.isHidden(),
@@ -137,6 +146,7 @@ public class DaoProductServiceImpl implements ProductService {
         model.setIconUrl(dto.getIconUrl());
         model.setPurchaseUrl(dto.getPurchaseUrl());
         model.setDescription(dto.getDescription());
+        model.setKeygenId(dto.getKeygenId());
         model.setOwnerUid(dto.getOwnerUid());
         model.setDisabled(dto.isDisabled());
         model.setHidden(dto.isHidden());

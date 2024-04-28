@@ -1,19 +1,18 @@
 package me.bannock.capstone.backend.products.service;
 
-import jakarta.persistence.Column;
-
 public class ProductDTO {
 
     public ProductDTO(long id, String name, String iconUrl,
-                       String purchaseUrl, String description,
-                       long ownerUid, boolean disabled,
-                       boolean hidden, boolean approved,
-                      double price){
+                      String purchaseUrl, String description,
+                      String keygenId, long ownerUid,
+                      boolean disabled, boolean hidden,
+                      boolean approved, double price){
         this.id = id;
         this.name = name;
         this.iconUrl = iconUrl;
         this.purchaseUrl = purchaseUrl;
         this.description = description;
+        this.keygenId = keygenId;
         this.ownerUid = ownerUid;
         this.disabled = disabled;
         this.hidden = hidden;
@@ -21,8 +20,8 @@ public class ProductDTO {
         this.price = price;
     }
 
-    private long id;
-    private String name, iconUrl, purchaseUrl, description;
+    private final long id;
+    private String name, iconUrl, purchaseUrl, description, keygenId;
     private Long ownerUid;
     private boolean disabled, hidden, approved;
     private double price;
@@ -61,6 +60,14 @@ public class ProductDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getKeygenId() {
+        return keygenId;
+    }
+
+    public void setKeygenId(String keygenId) {
+        this.keygenId = keygenId;
     }
 
     public Long getOwnerUid() {
@@ -102,21 +109,4 @@ public class ProductDTO {
     public void setPrice(double price) {
         this.price = price;
     }
-
-    @Override
-    public String toString() {
-        return "ProductDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", iconUrl='" + iconUrl + '\'' +
-                ", purchaseUrl='" + purchaseUrl + '\'' +
-                ", description='" + description + '\'' +
-                ", ownerUid=" + ownerUid +
-                ", disabled=" + disabled +
-                ", hidden=" + hidden +
-                ", approved=" + approved +
-                ", price=" + price +
-                '}';
-    }
-
 }

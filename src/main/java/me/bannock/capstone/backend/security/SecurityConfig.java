@@ -50,21 +50,18 @@ public class SecurityConfig {
     public DefaultSecurityFilterChain configureHttp(HttpSecurity security, AuthenticationFailureHandler authFailureHandler,
                                                     AccessDeniedHandler accessDeniedHandler,
                                                     UserService userService, UserDetailsService userDetailsService) throws Exception {
-        security.authorizeHttpRequests(authManagerRegistry -> {
-            authManagerRegistry.requestMatchers(
-                    "/", "/helloWorld", "/logout*", "/register"
-            ).permitAll().anyRequest().authenticated();
-        });
+        security.authorizeHttpRequests(authManagerRegistry -> authManagerRegistry.requestMatchers(
+                "/", "/helloWorld", "/logout*", "/register", "/api/licensing/1/generate/**"
+        ).permitAll().anyRequest().authenticated());
 
         // Configure login
-        security.formLogin(loginConfigurer -> {
-            loginConfigurer.loginProcessingUrl("/processLogin")
-                    .defaultSuccessUrl("/app/main?loggedIn=true", true)
-                    .failureHandler(authFailureHandler)
-                    .usernameParameter("email")
-                    .passwordParameter("password")
-                    .loginPage("/login").permitAll();
-        });
+        security.formLogin(loginConfigurer -> loginConfigurer.loginProcessingUrl("/processLogin")
+                .defaultSuccessUrl("/app/main?loggedIn=true", true)
+                .failureHandler(authFailureHandler)
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .loginPage("/login").permitAll()
+        );
 
         // We assign a custom access denied handler so we could log the failed attempt
         security.exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler));

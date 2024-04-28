@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 @Table(name = "products")
@@ -15,14 +14,16 @@ public class ProductModel {
 
     public ProductModel(){}
 
-    protected ProductModel(long ownerUid, String defaultProductName,
-                           String defaultProductDescription, String defaultProductIconUrl,
-                           String defaultProductPurchaseUrl, double price){
-        this.name = defaultProductName;
-        this.description = defaultProductDescription;
+    protected ProductModel(long ownerUid, String productName,
+                           String productDescription, String productIconUrl,
+                           String productPurchaseUrl, String keygenId,
+                           double price){
+        this.name = productName;
+        this.description = productDescription;
         this.ownerUid = ownerUid;
-        this.iconUrl = defaultProductIconUrl;
-        this.purchaseUrl = defaultProductPurchaseUrl;
+        this.iconUrl = productIconUrl;
+        this.purchaseUrl = productPurchaseUrl;
+        this.keygenId = keygenId;
         this.disabled = false;
         this.approved = false;
         this.hidden = true;
@@ -49,6 +50,9 @@ public class ProductModel {
 
     @Column(name = "purchase_url")
     private String purchaseUrl;
+
+    @Column(name = "keygen_id")
+    private String keygenId;
 
     @Column(name = "disabled")
     private boolean disabled;
@@ -106,6 +110,14 @@ public class ProductModel {
         this.purchaseUrl = purchaseUrl;
     }
 
+    public String getKeygenId() {
+        return keygenId;
+    }
+
+    public void setKeygenId(String keygenId) {
+        this.keygenId = keygenId;
+    }
+
     public boolean isDisabled() {
         return disabled;
     }
@@ -147,6 +159,7 @@ public class ProductModel {
                 ", ownerUid=" + ownerUid +
                 ", iconUrl='" + iconUrl + '\'' +
                 ", purchaseUrl='" + purchaseUrl + '\'' +
+                ", keygenId='***'" +
                 ", disabled=" + disabled +
                 ", hidden=" + hidden +
                 ", approved=" + approved +

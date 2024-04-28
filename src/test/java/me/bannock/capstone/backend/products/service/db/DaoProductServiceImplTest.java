@@ -2,17 +2,19 @@ package me.bannock.capstone.backend.products.service.db;
 
 import me.bannock.capstone.backend.products.service.ProductDTO;
 import me.bannock.capstone.backend.products.service.ProductServiceException;
-import me.bannock.capstone.backend.products.service.db.DaoProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class DaoProductServiceImplTest {
@@ -33,6 +35,9 @@ class DaoProductServiceImplTest {
 
     @Value("${backend.productService.maxProductPurchaseUrlLength}")
     private int maxProductPurchaseUrlLength;
+
+    @Value("${backend.productService.maxKeygenIdLength}")
+    private int maxKeygenIdLength;
 
     @Test
     @WithMockUser(authorities = {"PRIV_REGISTER_PRODUCT"})
@@ -58,6 +63,7 @@ class DaoProductServiceImplTest {
         String newName = product.get().getName() + "_";
         String newDesc = product.get().getDescription() + "_";
         String newUrls = "test.test.test.test.example.com";
+        String newKeygen = product.get().getKeygenId() + "_";
         boolean disabled = !product.get().isDisabled();
         boolean hidden = !product.get().isHidden();
         boolean approved = !product.get().isApproved();
@@ -66,6 +72,7 @@ class DaoProductServiceImplTest {
         product.get().setDescription(newDesc);
         product.get().setIconUrl(newUrls);
         product.get().setPurchaseUrl(newUrls);
+        product.get().setKeygenId(newKeygen);
         product.get().setDisabled(disabled);
         product.get().setHidden(hidden);
         product.get().setApproved(approved);
@@ -79,6 +86,7 @@ class DaoProductServiceImplTest {
         assertEquals(product.get().getDescription(), newDesc);
         assertEquals(product.get().getIconUrl(), newUrls);
         assertEquals(product.get().getPurchaseUrl(), newUrls);
+        assertEquals(product.get().getKeygenId(), newKeygen);
         assertEquals(product.get().isDisabled(), disabled);
         assertEquals(product.get().isHidden(), hidden);
         assertEquals(product.get().isApproved(), approved);
@@ -89,6 +97,7 @@ class DaoProductServiceImplTest {
         String badDesc = new String(new char[maxProductDescriptionLength + 1]);
         String badIconUrl = new String(new char[maxProductIconUrlLength + 1]);
         String badPurchaseUrl = new String(new char[maxProductPurchaseUrlLength + 1]);
+        String badKeygenId = new String(new char[maxKeygenIdLength + 1]);
 
         product.get().setName(badName);
         final ProductDTO finalProduct1 = product.get();
@@ -111,6 +120,10 @@ class DaoProductServiceImplTest {
         product.get().setPurchaseUrl(badPurchaseUrl);
         final ProductDTO finalProduct4 = product.get();
         assertThrows(ProductServiceException.class, () -> productService.setProductDetails(finalProduct4));
+
+        product.get().setKeygenId(badKeygenId);
+        final ProductDTO finalProduct5 = product.get();
+        assertThrows(ProductServiceException.class, () -> productService.setProductDetails(finalProduct5));
 
         // Double check to ensure the changes didn't go through
         product = productService.getProductDetails(productId);

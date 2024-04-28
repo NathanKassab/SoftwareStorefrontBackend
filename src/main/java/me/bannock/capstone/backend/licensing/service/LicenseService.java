@@ -39,6 +39,7 @@ public interface LicenseService {
      * @return The newly generated license key
      * @throws LicenseServiceException If something goes wrong while generating the key
      */
+    @Secured("PRIV_CREATE_LICENSE")
     String createLicense(long productId) throws LicenseServiceException;
 
     /**

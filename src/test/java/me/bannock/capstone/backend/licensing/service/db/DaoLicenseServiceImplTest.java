@@ -19,7 +19,7 @@ class DaoLicenseServiceImplTest {
 
     @Test
     @WithMockUser(authorities = {"PRIV_DELETE_LICENSE", "PRIV_GET_LICENSES", "PRIV_USE_OWN_LICENSES",
-            "PRIV_DEACTIVATE_LICENSE", "PRIV_ACTIVATE_LICENSE"})
+            "PRIV_DEACTIVATE_LICENSE", "PRIV_ACTIVATE_LICENSE", "PRIV_CREATE_LICENSE"})
     void deactivateAndDeleteLicense() throws LicenseServiceException {
         String license = licenseService.createLicense(TEST_PRODUCT_ID);
         assertNotNull(license);
@@ -38,7 +38,7 @@ class DaoLicenseServiceImplTest {
 
     @Test
     @WithMockUser(authorities = {"PRIV_ACTIVATE_LICENSE", "PRIV_USE_OWN_LICENSES",
-            "PRIV_DEACTIVATE_LICENSE", "PRIV_GET_LICENSES"})
+            "PRIV_DEACTIVATE_LICENSE", "PRIV_GET_LICENSES", "PRIV_CREATE_LICENSE"})
     void checkOwnsProduct() throws LicenseServiceException {
         deactivateLicense();
         String license = licenseService.createLicense(TEST_PRODUCT_ID);
@@ -60,7 +60,7 @@ class DaoLicenseServiceImplTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"PRIV_ACTIVATE_LICENSE", "PRIV_DEACTIVATE_LICENSE"})
+    @WithMockUser(authorities = {"PRIV_ACTIVATE_LICENSE", "PRIV_DEACTIVATE_LICENSE", "PRIV_CREATE_LICENSE"})
     void generateLicenseAndActivate(){
         deactivateLicense();
         assertDoesNotThrow(() -> {
