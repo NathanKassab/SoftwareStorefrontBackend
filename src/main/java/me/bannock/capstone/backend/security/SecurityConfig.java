@@ -51,7 +51,8 @@ public class SecurityConfig {
                                                     AccessDeniedHandler accessDeniedHandler,
                                                     UserService userService, UserDetailsService userDetailsService) throws Exception {
         security.authorizeHttpRequests(authManagerRegistry -> authManagerRegistry.requestMatchers(
-                "/", "/helloWorld", "/logout*", "/register", "/api/licensing/1/generate/**"
+                "/", "/helloWorld", "/logout*", "/register", "/api/licensing/1/generate/**",
+                "/products/**", "/resources/**"
         ).permitAll().anyRequest().authenticated());
 
         // Configure login

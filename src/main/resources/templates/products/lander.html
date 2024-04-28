@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.getName()}"></title>
+    <link rel="stylesheet" href="/resources/css/theme.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="display:flex; align-items: center; justify-content: center;">
+
+<div style="text-align: center; display: flex; width: 50vw; height: 50vh; border: var(--bnok-purple) solid 1px; border-radius: 5px; justify-content: space-between">
+    <p>
+        <span th:text="${product.getName()}"></span>
+    </p>
+    <p>
+        <!-- User view (to actual download link) -->
+        <a sec:authorize="isAuthenticated()" th:href="${product.getPurchaseUrl()}">
+            <button th:text="${'$' + product.getPrice()}"></button>
+        </a>
+
+        <!-- Guest view (to login screen) -->
+        <a sec:authorize="isAnonymous()" href="/login">
+            <button th:text="${'$' + product.getPrice()}"></button>
+        </a>
+    </p>
+</div>
+
+</body>
+</html>

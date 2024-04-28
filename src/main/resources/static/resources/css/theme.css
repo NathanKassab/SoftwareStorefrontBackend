@@ -1,0 +1,18 @@
+:root {
+    --light-blue: #a5e0fe;
+    --bnok-purple: #d58cff;
+    --grey: #a5a5a5;
+    --dark-grey: #656565;
+    --black: #1e1e1e;
+}
+
+body{
+    margin: 0;
+    background-color: var(--black);
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    width: 100vw;
+    height: 100vh;
+}
