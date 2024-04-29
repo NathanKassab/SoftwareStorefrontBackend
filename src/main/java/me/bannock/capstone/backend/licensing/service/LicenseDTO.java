@@ -10,7 +10,7 @@ public class LicenseDTO {
         Objects.requireNonNull(license);
 
         this.id = id;
-        this.holderId = id;
+        this.holderId = holderId;
         this.productId = productId;
         this.license = license;
     }

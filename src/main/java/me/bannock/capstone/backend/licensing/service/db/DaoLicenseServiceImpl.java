@@ -69,6 +69,8 @@ public class DaoLicenseServiceImpl implements LicenseService {
         Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
         if (licenseModel.isEmpty())
             throw new LicenseServiceException("License could not be found", -1);
+        else if (licenseModel.get().getHolder() != null)
+            throw new LicenseServiceException("License is already activated", licenseModel.get().getId());
 
         Optional<LicenseModel> checkForDupes = licenseRepo.findLicenseModelByHolderAndProductId(
                 userId, licenseModel.get().getProductId());

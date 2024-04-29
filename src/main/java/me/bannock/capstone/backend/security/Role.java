@@ -8,8 +8,7 @@ public enum Role {
             Set.of(Privilege.PRIV_LOGIN)
     ),
     ROLE_USER(
-            Set.of(Privilege.PRIV_LOGIN, Privilege.PRIV_USE_API,
-                    Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_MAIN_APP_PANEL)
+            Set.of(Privilege.PRIV_LOGIN, Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_MAIN_APP_PANEL)
     ),
     ROLE_MODERATOR(
             Set.of(Privilege.PRIV_LOGIN, Privilege.PRIV_LAUNCH_LOADER,
