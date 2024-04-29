@@ -39,7 +39,7 @@ public class ProductModel {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 2500)
     private String description;
 
     @Column(name = "owner_uid")
@@ -48,7 +48,7 @@ public class ProductModel {
     @Column(name = "icon_url")
     private String iconUrl;
 
-    @Column(name = "purchase_url")
+    @Column(name = "purchase_url", length = 750)
     private String purchaseUrl;
 
     @Column(name = "keygen_id")

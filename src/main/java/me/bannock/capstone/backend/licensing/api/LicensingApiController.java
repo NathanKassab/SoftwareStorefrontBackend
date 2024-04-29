@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/licensing/1/")
-@Secured("PRIV_USE_API")
 public class LicensingApiController {
 
     @Autowired

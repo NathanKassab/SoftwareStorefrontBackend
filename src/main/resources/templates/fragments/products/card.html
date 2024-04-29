@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/resources/css/theme.css" rel="stylesheet">
+    <link href="/resources/css/productLander.css" rel="stylesheet">
+</head>
+<div th:fragment="productCard" style="display: flex; justify-content: space-between">
+    <div style="height: 100%; width: 75%; display: flex; flex-direction: column; align-items: flex-start;">
+        <h2 style="margin: 5px;" th:text="${product.getName()}"></h2>
+        <h4 style="margin: 5px; color: var(--grey);" th:text="'by ' + ${owner.getUsername()}"></h4>
+        <h4 style="margin: 5px;" th:text="${'$' + product.getPrice()}"></h4>
+        <pre style="white-space: pre-wrap;" th:text="${product.getDescription()}"></pre>
+    </div>
+    <div style="height: 100%; width: 25%; display: flex; justify-content: flex-end;">
+        <!-- User view (to actual download link) -->
+        <a class="purchaseContainer" sec:authorize="isAuthenticated()" th:href="${product.getPurchaseUrl()}">
+            <button class="purchaseButton">Purchase</button>
+        </a>
+
+        <!-- Guest view (to login screen) -->
+        <a class="purchaseContainer" sec:authorize="isAnonymous()" href="/login">
+            <button class="purchaseButton">Purchase</button>
+        </a>
+    </div>
+</div>
+</html>

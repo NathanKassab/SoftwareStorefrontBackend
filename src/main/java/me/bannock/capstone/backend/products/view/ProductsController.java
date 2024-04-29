@@ -1,6 +1,8 @@
 package me.bannock.capstone.backend.products.view;
 
 import jakarta.servlet.http.HttpServletRequest;
+import me.bannock.capstone.backend.accounts.service.AccountDTO;
+import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.products.service.ProductDTO;
 import me.bannock.capstone.backend.products.service.ProductService;
 import me.bannock.capstone.backend.products.service.ProductServiceException;
@@ -20,18 +22,21 @@ import java.util.Optional;
 public class ProductsController {
 
     @Autowired
-    public ProductsController(ProductService productService){
+    public ProductsController(ProductService productService, UserService userService){
         this.productService = productService;
+        this.userService = userService;
     }
 
     private final Logger logger = LogManager.getLogger();
     private final ProductService productService;
+    private final UserService userService;
 
     @GetMapping("view/{productId}")
     public String productLander(HttpServletRequest request,
                                 @PathVariable(name = "productId") long productId,
                                 Model model){
 
+        long productOwnerUid;
         try {
             Optional<ProductDTO> product = productService.getProductDetails(productId);
 
@@ -47,6 +52,7 @@ public class ProductsController {
                 return "products/unavailable";
             }
 
+            productOwnerUid = product.get().getOwnerUid();
             model.addAttribute("product", product.get());
         } catch (ProductServiceException e) {
             logger.error(
@@ -54,6 +60,17 @@ public class ProductsController {
                     e, productId, request.getSession().getId());
             throw new RuntimeException(e);
         }
+
+        // Now that we've verified that the product exists, we need to verify the owner account
+        // and grab information from that as well
+        Optional<AccountDTO> owner = userService.getAccountWithUid(productOwnerUid);
+        if (owner.isEmpty()){
+            logger.error("User attempted to access product where owner does not exist; " +
+                            "this should never happen, productId={}, ownerUid={}, sessionId={}",
+                    productId, productOwnerUid, request.getSession().getId());
+            return "products/unavailable";
+        }
+        model.addAttribute("owner", owner.get());
 
         return "products/lander";
     }

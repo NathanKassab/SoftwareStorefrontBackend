@@ -1,0 +1,15 @@
+.purchaseButton{
+    background-color: var(--black);
+    color: white;
+    padding: 10px;
+    border: 1px solid var(--bnok-purple);
+    border-radius: 2px;
+}
+
+.purchaseButton:hover{
+    border-color: var(--light-blue);
+}
+
+.purchaseContainer{
+    margin: 14px;
+}
