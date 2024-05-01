@@ -1,5 +1,7 @@
 package me.bannock.capstone.backend.accounts.service;
 
+import org.springframework.security.access.annotation.Secured;
+
 import java.util.Optional;
 
 public interface UserService {
@@ -77,6 +79,7 @@ public interface UserService {
      * @param privilegeName The name of the privilege
      * @throws UserServiceException If something goes wrong while granting the privilege
      */
+    @Secured("PRIV_MANAGE_USER_PRIVS")
     void grantPrivilege(long uid, String privilegeName) throws UserServiceException;
 
     /**
@@ -85,6 +88,7 @@ public interface UserService {
      * @param privilegeName The name of the privilege to revoke
      * @throws UserServiceException If something goes wrong while revoking the privilege
      */
+    @Secured("PRIV_MANAGE_USER_PRIVS")
     void revokePrivilege(long uid, String privilegeName) throws UserServiceException;
 
     /**

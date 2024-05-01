@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>User Control Panel</title>
@@ -11,7 +11,7 @@
 
 <!--<p style="margin: 0;" th:if="${justLoggedIn}" th:text="${'Welcome back ' + user.getName() + '!'}"></p>-->
 
-<div id="sideNav" style="display: flex; width: 20%; height: 100%;" th:insert="~{app/sideNav :: sideNav}"></div>
+<div id="sideNav" style="width: 20%; height: 100%;" th:insert="~{app/sideNav :: sideNav}"></div>
 <div id="content" style="width: 80%; height: 100%"
      th:insert="${page == null} ? ~{app/pages/void :: content} : ~{${'app/pages/' + page} :: content}"></div>
 

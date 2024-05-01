@@ -38,18 +38,11 @@ public class BackendAuthProvider implements AuthenticationProvider {
             throw new AuthenticationException(e.getMessage()) {};
         }
 
-        // We need to get a user details object from the user details service so we could create an auth token
+        // We need to get a user details object from the user details service so we can create an auth token
         Optional<String> userEmail = userService.getAccountEmail(userId);
         if (userEmail.isEmpty())
             throw new RuntimeException("Couldn't get email for user id");
         UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail.get());
-
-        // We need to check that the user has the login privilege before assigning the token
-        if (userDetails.getAuthorities()
-                .stream().noneMatch(authority -> authority.getAuthority().equals(Privilege.PRIV_LOGIN.getPrivilege()))) {
-            logger.info("Denied user login because user does not have permission to login, userDetails={}", userDetails);
-            throw new BadCredentialsException("No permission to login, lol");
-        }
 
         if (!userDetails.isEnabled()){
             logger.info("Denied user login due to account being disabled, userDetails={}", userDetails);

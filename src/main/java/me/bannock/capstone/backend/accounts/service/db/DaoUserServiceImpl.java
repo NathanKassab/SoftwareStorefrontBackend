@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +51,9 @@ public class DaoUserServiceImpl implements UserService {
             throw new UserServiceException("Could not find user account what matched email", -1);
         if (!passwordEncoder.matches(password, user.get().getPassword()))
             throw new UserServiceException("Password is incorrect", user.get().getId());
+
+        checkAccountCanLogin(user);
+
         return user.get().getId();
     }
 
@@ -67,7 +69,22 @@ public class DaoUserServiceImpl implements UserService {
         if (user.get().getPrivileges().stream().noneMatch(priv -> priv.equals(Privilege.PRIV_USE_API.getPrivilege())))
             throw new UserServiceException("Privilege \"PRIV_USE_API\" is needed to authenticate through api", user.get().getId());
 
+        checkAccountCanLogin(user);
+
         return user.get().getId();
+    }
+
+    private void checkAccountCanLogin(Optional<AccountModel> user) throws UserServiceException{
+        Objects.requireNonNull(user);
+        if (user.isEmpty())
+            throw new IllegalArgumentException();
+        // If the user doesn't have the PRIV_LOGIN privilege, we must block their login
+        if (user.get().getPrivileges().stream().noneMatch(priv -> priv.equals(Privilege.PRIV_LOGIN.getPrivilege())))
+            throw new UserServiceException("You do not have permission to login, lol", user.get().getId());
+
+        // Disabled accounts are unable to login as well
+        if (user.get().isDisabled())
+            throw new UserServiceException("Your account is disabled", user.get().getId());
     }
 
     @Override
@@ -214,6 +231,7 @@ public class DaoUserServiceImpl implements UserService {
                 user.getEmail(),
                 user.getUsername(),
                 user.getPassword(),
+                user.getApiKey(),
                 !user.isEmailVerified(),
                 false, false,
                 user.isDisabled()

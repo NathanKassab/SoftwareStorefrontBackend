@@ -8,14 +8,15 @@ public class AccountDTO {
 
     public AccountDTO(long uid, Collection<? extends GrantedAuthority> authorities,
                       String email, String username,
-                      String password, boolean expired,
+                      String password, String apiKey, boolean expired,
                       boolean passwordExpired, boolean locked,
                       boolean disabled){
         this.uid = uid;
         this.authorities = authorities;
-        this.password = password;
         this.email = email;
         this.username = username;
+        this.password = password;
+        this.apiKey = apiKey;
         this.expired = expired;
         this.passwordExpired = passwordExpired;
         this.locked = locked;
@@ -27,6 +28,7 @@ public class AccountDTO {
     private final String email;
     private final String username;
     private final String password;
+    private final String apiKey;
     private final boolean expired, passwordExpired, locked, disabled;
 
     public long getUid() {
@@ -47,6 +49,10 @@ public class AccountDTO {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 
     public boolean isExpired() {

@@ -3,6 +3,7 @@ package me.bannock.capstone.backend.licensing.api;
 import jakarta.servlet.http.HttpServletRequest;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
+import me.bannock.capstone.backend.accounts.service.UserServiceException;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
 import me.bannock.capstone.backend.products.service.ProductDTO;
@@ -85,6 +86,15 @@ public class LicenseGenerationController {
         Optional<AccountDTO> user = userService.getAccountWithUid(uid);
         if (user.isEmpty())
             return ResponseEntity.badRequest().body("Owner uid %s does not resolve to a registered account".formatted(uid));
+
+        // Now we grab the api key from the user and authenticate using that
+        String apiKey = user.get().getApiKey();
+        try {
+            userService.loginWithApiKey(apiKey);
+        } catch (UserServiceException e) {
+            return ResponseEntity.badRequest().body(e.getErrorMessage());
+        }
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.get().getEmail());
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities())
@@ -92,9 +102,8 @@ public class LicenseGenerationController {
 
         // We can now generate the license now that our request is authenticated
         try {
-
            String license = licenseService.createLicense(productId);
-            logger.info("User has created a new license key, uid={}, productId={}, sessionId={}",
+           logger.info("User has created a new license key, uid={}, productId={}, sessionId={}",
                     uid, productId, request.getSession().getId());
             return ResponseEntity.ok(license);
         } catch (LicenseServiceException e) {

@@ -62,18 +62,10 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(account.get().getEmail());
-
-            // Make sure that the user has the permission to actually use the api before authorizing
-            if (userDetails.getAuthorities()
-                    .stream().noneMatch(authority -> authority.getAuthority().equals(Privilege.PRIV_USE_API.getPrivilege()))){
-                response.sendError(401, "Your user does not have the needed privilege to authenticate through API keys");
-                return;
-            }
-
-            // Finally authorize the user
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                     userDetails, userDetails.getPassword(), userDetails.getAuthorities()
             ));
+
             filterChain.doFilter(request, response);
         } catch (UserServiceException e) {
             response.sendError(401, "Unable to authenticate with header");

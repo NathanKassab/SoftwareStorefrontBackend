@@ -5,6 +5,7 @@ import me.bannock.capstone.backend.security.Privilege;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Optional;
 
@@ -35,8 +36,10 @@ class DaoUserServiceImplTest {
     }
 
     @Test
+    @WithMockUser(authorities = {"PRIV_MANAGE_USER_PRIVS"})
     void genApiKeyAndThenGetUserWithApiKey() throws Exception {
         Long userId = registerAndLogin();
+        userService.grantPrivilege(userId, "PRIV_USE_API");
         String apiKey = userService.genApiKey(userId);
         assertNotNull(apiKey);
         Optional<Long> user2 = userService.getWithApiKey(apiKey);
@@ -76,6 +79,7 @@ class DaoUserServiceImplTest {
     }
 
     @Test
+    @WithMockUser(authorities = {"PRIV_MANAGE_USER_PRIVS"})
     void grantAndRevokePrivilegesTest() throws Exception {
         long userId = registerAndLogin();
         Optional<String> email = userService.getAccountEmail(userId);
