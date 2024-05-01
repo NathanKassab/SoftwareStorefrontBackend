@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${product.getName()}"></title>
-    <link href="/resources/css/theme.css" rel="stylesheet">
-    <link href="/resources/css/productLander.css" rel="stylesheet">
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/productLander.css}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="display:flex; align-items: center; justify-content: center;">
 
 <div style="width: 50vw; height: 50vh; border: var(--bnok-purple) solid 1px; border-radius: 5px;"
-     th:insert="~{fragments/products/card :: productCard}"></div>
+     th:insert="~{products/card :: productCard}"></div>
 
 </body>
 </html>

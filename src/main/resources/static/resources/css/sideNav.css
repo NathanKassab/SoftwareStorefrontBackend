@@ -1,0 +1,35 @@
+.sideNavLink{
+    width: 100%;
+    margin: 2px;
+    font-size: 1.5em;
+}
+
+.sideNavCurrentPage{
+    color: var(--bnok-purple);
+    text-decoration: none;
+}
+
+.sideNavCurrentPage:hover{
+    text-decoration: underline;
+    text-decoration-color: var(--bnok-purple);
+}
+
+.sideNavCurrentPage:focus{
+    text-decoration: underline;
+    text-decoration-color: var(--light-blue);
+    color: var(--light-blue);
+}
+
+.sideNavPage{
+    color: white;
+    text-decoration: none;
+}
+
+.sideNavPage:hover{
+    text-decoration: underline;
+}
+
+.sideNavPage:focus{
+    text-decoration: underline;
+    text-decoration-color: var(--light-blue);
+}

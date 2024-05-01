@@ -6,10 +6,10 @@
 </head>
 <div th:fragment="productCard" style="display: flex; justify-content: space-between">
     <div style="height: 100%; width: 75%; display: flex; flex-direction: column; align-items: flex-start;">
-        <h2 style="margin: 5px;" th:text="${product.getName()}"></h2>
-        <h4 style="margin: 5px; color: var(--grey);" th:text="'by ' + ${owner.getUsername()}"></h4>
-        <h4 style="margin: 5px;" th:text="${'$' + product.getPrice()}"></h4>
-        <pre style="white-space: pre-wrap;" th:text="${product.getDescription()}"></pre>
+        <h2 style="margin: 12px 8px 2px 12px;" th:text="${product.getName()}"></h2>
+        <h4 style="margin: 8px 2px 2px 12px; color: var(--grey);" th:text="'by ' + ${owner.getUsername()}"></h4>
+        <h4 style="margin: 8px 2px 2px 12px;" th:text="${'$' + product.getPrice()}"></h4>
+        <pre style="white-space: pre-wrap; margin: 8px 2px 2px 12px;" th:text="${product.getDescription()}"></pre>
     </div>
     <div style="height: 100%; width: 25%; display: flex; justify-content: flex-end;">
         <!-- User view (to actual download link) -->

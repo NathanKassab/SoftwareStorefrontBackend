@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Control Panel</title>
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/sideNav.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="display: flex; justify-content: space-between;">
+
+<!--<p style="margin: 0;" th:if="${justLoggedIn}" th:text="${'Welcome back ' + user.getName() + '!'}"></p>-->
+
+<div id="sideNav" style="display: flex; width: 20%; height: 100%;" th:insert="~{app/sideNav :: sideNav}"></div>
+<div id="content" style="width: 80%; height: 100%"
+     th:insert="${page == null} ? ~{app/pages/void :: content} : ~{${'app/pages/' + page} :: content}"></div>
+
+</body>
+</html>

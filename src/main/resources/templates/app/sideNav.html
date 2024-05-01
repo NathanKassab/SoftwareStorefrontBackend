@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/sideNav.css}" rel="stylesheet">
+</head>
+<body>
+
+<div th:fragment="sideNav" style="width: 100%; height: 100%; border-right: var(--bnok-purple) 1px solid;">
+    <div th:each="accessiblePage : ${sideBarPages}">
+        <a th:href="${'/app/main/' + accessiblePage}"
+           th:text="${T(me.bannock.capstone.backend.utils.StringsUtils).convertCamelCaseToText(accessiblePage)}"
+           th:class="'sideNavLink ' + (${#strings.endsWith(request.getRequestURI(), accessiblePage)} ? 'sideNavCurrentPage' : 'sideNavPage')"
+           style="display: inline-block;"></a>
+        <br/>
+    </div>
+</div>
+
+</body>
+</html>
