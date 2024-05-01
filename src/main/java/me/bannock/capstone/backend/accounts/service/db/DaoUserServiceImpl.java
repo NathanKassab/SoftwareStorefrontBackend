@@ -39,6 +39,9 @@ public class DaoUserServiceImpl implements UserService {
     @Value("${backend.userService.maxGenApiKeyTries}")
     private int MAX_GEN_API_KEY_TRIES;
 
+    @Value("${backend.userService.autoVerifyEmails}")
+    private boolean autoVerifyEmails;
+
     @Override
     public long login(String email, String password) throws UserServiceException {
         Objects.requireNonNull(email);
@@ -104,6 +107,9 @@ public class DaoUserServiceImpl implements UserService {
                 .map(Privilege::getPrivilege).toList();
         newUser.setPrivileges(privs);
 
+        if (autoVerifyEmails)
+            newUser.setEmailVerified(true);
+
         logger.info("A new user registered an account: {}", newUser);
         userRepo.saveAndFlush(newUser);
     }
@@ -118,7 +124,7 @@ public class DaoUserServiceImpl implements UserService {
     public String genApiKey(long uid) throws UserServiceException {
         Optional<AccountModel> user = userRepo.findAccountModelById(uid);
         if (user.isEmpty())
-            throw new IllegalArgumentException("No account exists with user id %s".formatted(uid));
+            throw new UserServiceException("No account exists with user id %s".formatted(uid), uid);
 
         // We must generate a unique api key before saving
         String newApiKey;
@@ -126,7 +132,7 @@ public class DaoUserServiceImpl implements UserService {
         do{
             newApiKey = this.keyGenService.generateNewKey();
             if (attemptedTries++ >= MAX_GEN_API_KEY_TRIES)
-                throw new RuntimeException("Couldn't generate a unique api key");
+                throw new UserServiceException("Couldn't generate a unique api key", uid);
         }while (userRepo.existsByApiKey(newApiKey));
 
         // Only now do we save the changes
@@ -152,6 +158,14 @@ public class DaoUserServiceImpl implements UserService {
         Objects.requireNonNull(email);
 
         Optional<AccountModel> userOptional = userRepo.findAccountModelByEmail(email);
+        return userOptional.map(this::createDto);
+    }
+
+    @Override
+    public Optional<AccountDTO> getAccountWithUsername(String username) {
+        Objects.requireNonNull(username);
+
+        Optional<AccountModel> userOptional = userRepo.findAccountModelByUsername(username);
         return userOptional.map(this::createDto);
     }
 

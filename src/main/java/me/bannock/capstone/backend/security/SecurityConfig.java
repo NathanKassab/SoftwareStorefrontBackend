@@ -64,6 +64,8 @@ public class SecurityConfig {
                 .loginPage("/login").permitAll()
         );
 
+        security.logout(logoutConfigurer -> logoutConfigurer.logoutUrl("/logout").clearAuthentication(true));
+
         // We assign a custom access denied handler so we could log the failed attempt
         security.exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler));
 

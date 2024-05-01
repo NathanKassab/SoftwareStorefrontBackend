@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div th:fragment="content">
+    <div style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
+        <span>User ID: </span><span style="color: var(--light-blue)" th:text="${userDto.getUid()}"></span><br/>
+        <span>Email: </span><span style="color: var(--light-blue)" th:text="${userDto.getEmail()}"></span><br/>
+        <span>Username: </span><span style="color: var(--light-blue)" th:text="${userDto.getUsername()}"></span><br/>
+        <span>API Key: </span><span style="color: var(--light-blue)" th:text="${userDto.getApiKey() == null} ? 'null' : ${userDto.getApiKey()}"></span><form style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/genApiKey}"><button type="submit">Refresh</button></form><br/>
+        <span>Account expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isExpired()}"></span><br/>
+        <span>Password expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isPasswordExpired()}"></span><br/>
+        <span>Account locked: </span><span style="color: var(--light-blue)" th:text="${userDto.isLocked()}"></span><br/>
+        <span>Account enabled: </span><span style="color: var(--light-blue)" th:text="${!userDto.isDisabled()}"></span><br/>
+    </div>
+
+    <!-- If permitted, the user will see a list of their own privileges in this menu -->
+    <div sec:authorize="hasAnyAuthority('PRIV_VIEW_OWN_PRIVS', 'PRIV_VIEW_USER_PRIVS')" style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
+        <h1 style="margin-bottom: 0">Privileges: </h1>
+        <small>(Relog to refresh privileges in portal)</small>
+        <ul>
+            <li th:each="priv : ${user.getAuthorities()}" th:text="${priv.getAuthority()}"></li>
+        </ul>
+    </div>
+
+    <div style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
+        <form method="POST" th:action="@{/logout}">
+            <input type="submit" value="Log out">
+        </form>
+    </div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,7 +1,5 @@
 package me.bannock.capstone.backend.accounts.service;
 
-import org.springframework.security.access.annotation.Secured;
-
 import java.util.Optional;
 
 public interface UserService {
@@ -67,6 +65,12 @@ public interface UserService {
     Optional<AccountDTO> getAccountWithUid(long uid);
 
     /**
+     * @param username The username to locate account with
+     * @return The account's data, if it could be found
+     */
+    Optional<AccountDTO> getAccountWithUsername(String username);
+
+    /**
      * Gets an account with their uid
      * @param uid The uid of the account
      * @return The account's email, if one could be found
@@ -79,7 +83,6 @@ public interface UserService {
      * @param privilegeName The name of the privilege
      * @throws UserServiceException If something goes wrong while granting the privilege
      */
-    @Secured("PRIV_MANAGE_USER_PRIVS")
     void grantPrivilege(long uid, String privilegeName) throws UserServiceException;
 
     /**
@@ -88,7 +91,6 @@ public interface UserService {
      * @param privilegeName The name of the privilege to revoke
      * @throws UserServiceException If something goes wrong while revoking the privilege
      */
-    @Secured("PRIV_MANAGE_USER_PRIVS")
     void revokePrivilege(long uid, String privilegeName) throws UserServiceException;
 
     /**

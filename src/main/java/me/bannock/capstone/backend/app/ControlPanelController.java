@@ -1,9 +1,12 @@
 package me.bannock.capstone.backend.app;
 
 import jakarta.servlet.http.HttpServletRequest;
+import me.bannock.capstone.backend.accounts.service.AccountDTO;
+import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.security.Privilege;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,26 +18,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/app/")
 @Secured("PRIV_VIEW_MAIN_APP_PANEL")
 public class ControlPanelController {
 
-    public ControlPanelController(){
+    @Autowired
+    public ControlPanelController(UserService userService){
+        this.userService = userService;
 
         // This is a simple way of limiting some user to specific pages
         Map<String, Privilege[]> pages = new LinkedHashMap<>();
-        pages.put("accountDetails", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
+        pages.put("myAccount", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
         pages.put("modifyUserPrivileges", new Privilege[]{Privilege.PRIV_VIEW_USER_PRIVS});
         this.pages = pages;
     }
 
     private final Logger logger = LogManager.getLogger();
+    private final UserService userService;
     private final Map<String, Privilege[]> pages;
 
     @GetMapping({"", "main", "main/", "main/{page}"})
@@ -70,11 +76,19 @@ public class ControlPanelController {
         // need to create a list of pages that the user is able to access
         List<String> sideBarPages = getPagesUserCanAccess();
 
+        Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (userDto.isEmpty()){
+            logger.error("Could not find user account, sessionId={}, username={}",
+                    request.getSession().getId(), SecurityContextHolder.getContext().getAuthentication().getName());
+            throw new RuntimeException("Could not find user account");
+        }
+
         model.addAttribute("request", request);
         model.addAttribute("sideBarPages", sideBarPages);
         model.addAttribute("page", page);
         model.addAttribute("justLoggedIn", justLoggedIn);
         model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication());
+        model.addAttribute("userDto", userDto.get());
         return "app/controlPanel";
     }
 

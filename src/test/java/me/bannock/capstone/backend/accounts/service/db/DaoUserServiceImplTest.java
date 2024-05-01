@@ -46,6 +46,11 @@ class DaoUserServiceImplTest {
         assertTrue(user2.isPresent());
         assertEquals(userId, user2.get());
 
+        // Also username because
+        Optional<Long> user3 = userService.getWithApiKey(apiKey);
+        assertTrue(user3.isPresent());
+        assertEquals(userId, user3.get());
+
         // We also check that the api key returned matches what we have
         assertTrue(userService.getApiKey(-1).isEmpty());
         Optional<String> fetchedApiKey  = userService.getApiKey(userId);
