@@ -21,6 +21,7 @@ public class LicenseModel {
         Objects.requireNonNull(license);
         this.license = license;
         this.productId = productId;
+        this.banned = false;
     }
 
     @Id
@@ -37,6 +38,9 @@ public class LicenseModel {
 
     @Column(name = "holder")
     private Long holder;
+
+    @Column(name = "banned")
+    private boolean banned;
 
     public Long getId() {
         return id;
@@ -66,6 +70,14 @@ public class LicenseModel {
         this.holder = holder;
     }
 
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
     @Override
     public String toString() {
         return "LicenseModel{" +
@@ -73,6 +85,7 @@ public class LicenseModel {
                 ", license='" + license + '\'' +
                 ", productId=" + productId +
                 ", holder=" + holder +
+                ", banned=" + banned +
                 '}';
     }
 

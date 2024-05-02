@@ -6,22 +6,25 @@ import java.util.Objects;
 
 public class LicenseDTO {
 
-    public LicenseDTO(long id, @Nullable Long holderId, long productId, String license){
+    public LicenseDTO(long id, @Nullable Long holderId, long productId, String license, boolean banned){
         Objects.requireNonNull(license);
 
         this.id = id;
         this.holderId = holderId;
         this.productId = productId;
         this.license = license;
+        this.banned = banned;
     }
 
-    private long id;
+    private final long id;
 
     private Long holderId;
 
     private long productId;
 
     private String license;
+
+    private boolean banned;
 
     public long getId() {
         return id;
@@ -51,6 +54,14 @@ public class LicenseDTO {
         this.license = license;
     }
 
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
     @Override
     public String toString() {
         return "LicenseDTO{" +
@@ -58,6 +69,7 @@ public class LicenseDTO {
                 ", holderId=" + holderId +
                 ", productId=" + productId +
                 ", license='" + license + '\'' +
+                ", banned=" + banned +
                 '}';
     }
 

@@ -1,9 +1,9 @@
 package me.bannock.capstone.backend.licensing.service.db;
 
+import me.bannock.capstone.backend.keygen.KeyGenService;
 import me.bannock.capstone.backend.licensing.service.LicenseDTO;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
-import me.bannock.capstone.backend.keygen.KeyGenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,18 +29,27 @@ public class DaoLicenseServiceImpl implements LicenseService {
 
     @Override
     public boolean ownsProduct(long userId, long productId) {
+        // The below method already checks if the license is banned already. If the license is banned, we will get an
+        // empty optional
         return getUsersLicenseForProduct(userId, productId).isPresent();
     }
 
     @Override
     public List<String> getUserLicenses(long userId) {
         return licenseRepo.findLicenseModelsByHolder(userId)
-                .stream().map(LicenseModel::getLicense).toList();
+                .stream()
+                .filter(l -> !l.isBanned()) // We filter out any banned licenses as they are no longer usable
+                .map(LicenseModel::getLicense) // Now that we have all the user's active licenses, we grab all the license keys from them to return
+                .toList();
     }
 
     @Override
     public Optional<String> getUsersLicenseForProduct(long userId, long productId) {
         Optional<LicenseModel> license = licenseRepo.findLicenseModelByHolderAndProductId(userId, productId);
+
+        if (license.isPresent() && license.get().isBanned())
+            return Optional.empty(); // License is banned so user is not allowed to use it
+
         return license.map(LicenseModel::getLicense);
     }
 
@@ -105,6 +114,36 @@ public class DaoLicenseServiceImpl implements LicenseService {
         return licenseRepo.findLicenseModelByLicense(license).map(this::mapToDto);
     }
 
+    @Override
+    public void banLicense(String license) throws LicenseServiceException {
+        setLicenseBanned(license, true);
+    }
+
+    @Override
+    public void unbanLicense(String license) throws LicenseServiceException {
+        setLicenseBanned(license, false);
+    }
+
+    @Override
+    public boolean isLicenseBanned(String license) {
+        Optional<LicenseDTO> dto = getLicense(license);
+        return dto.isPresent() && dto.get().isBanned();
+    }
+
+    /**
+     * Sets the banned state of a license key
+     * @param license The license to modify
+     * @param banned Whether the license should be banned
+     * @throws LicenseServiceException If something goes wrong while updating the license
+     */
+    private void setLicenseBanned(String license, boolean banned) throws LicenseServiceException{
+        Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
+        if (licenseModel.isEmpty())
+            throw new LicenseServiceException("License does not exist", -1);
+        licenseModel.get().setBanned(banned);
+        licenseRepo.saveAndFlush(licenseModel.get());
+    }
+
     /**
      * Maps a model to a DTO
      * @param model The model to map
@@ -112,7 +151,7 @@ public class DaoLicenseServiceImpl implements LicenseService {
      */
     private LicenseDTO mapToDto(LicenseModel model){
         return new LicenseDTO(model.getId(), model.getHolder(),
-                model.getProductId(), model.getLicense());
+                model.getProductId(), model.getLicense(), model.isBanned());
     }
 
 }

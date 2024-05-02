@@ -18,6 +18,25 @@ class DaoLicenseServiceImplTest {
     private static final long TEST_PRODUCT_ID = 0;
 
     @Test
+    @WithMockUser(authorities = {"PRIV_BAN_ANY_LICENSE", "PRIV_BAN_OWN_PRODUCT_LICENSES", "PRIV_UNBAN_ANY_LICENSE",
+            "PRIV_UNBAN_OWN_PRODUCT_LICENSES", "PRIV_DEACTIVATE_LICENSE", "PRIV_ACTIVATE_LICENSE",
+            "PRIV_CREATE_LICENSE", "PRIV_USE_OWN_LICENSES"})
+    void testBanAndUnbanLicense() throws LicenseServiceException {
+        String license = licenseService.createLicense(TEST_PRODUCT_ID);
+        assertNotNull(license);
+        assertFalse(license.isBlank());
+        deactivateLicense();
+        licenseService.activateLicense(TEST_OWNER_ID, license);
+        assertTrue(licenseService.ownsProduct(TEST_OWNER_ID, TEST_PRODUCT_ID));
+        licenseService.banLicense(license);
+        assertFalse(licenseService.ownsProduct(TEST_OWNER_ID, TEST_PRODUCT_ID));
+        assertTrue(licenseService.isLicenseBanned(license));
+        assertFalse(licenseService.isLicenseBanned(""));
+        licenseService.unbanLicense(license);
+        assertTrue(licenseService.ownsProduct(TEST_OWNER_ID, TEST_PRODUCT_ID));
+    }
+
+    @Test
     @WithMockUser(authorities = {"PRIV_DELETE_LICENSE", "PRIV_GET_LICENSES", "PRIV_USE_OWN_LICENSES",
             "PRIV_DEACTIVATE_LICENSE", "PRIV_ACTIVATE_LICENSE", "PRIV_CREATE_LICENSE"})
     void deactivateAndDeleteLicense() throws LicenseServiceException {

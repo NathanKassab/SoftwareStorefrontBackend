@@ -1,6 +1,7 @@
 package me.bannock.capstone.backend.licensing.service;
 
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,5 +75,28 @@ public interface LicenseService {
      * @return The license, if it could be found
      */
     Optional<LicenseDTO> getLicense(String license);
+
+    /**
+     * Bans a license key and prevents it from being used
+     * @param license The license key
+     * @throws LicenseServiceException If something goes wrong while banning the license
+     */
+    @PreAuthorize("hasAnyAuthority('PRIV_BAN_ANY_LICENSE', 'PRIV_BAN_OWN_PRODUCT_LICENSES')")
+    void banLicense(String license) throws LicenseServiceException;
+
+    /**
+     * Unbans a license key so that it could be used again
+     * @param license The license key
+     * @throws LicenseServiceException If something goes wrong while unbanning the license
+     */
+    @PreAuthorize("hasAnyAuthority('PRIV_UNBAN_ANY_LICENSE', 'PRIV_UNBAN_OWN_PRODUCT_LICENSES')")
+    void unbanLicense(String license) throws LicenseServiceException;
+
+    /**
+     * Checks if a license key is banned
+     * @param license The license key
+     * @return Whether the license is banned
+     */
+    boolean isLicenseBanned(String license);
 
 }
