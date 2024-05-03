@@ -60,6 +60,7 @@ class DaoProductServiceImplTest {
         assertTrue(product.isPresent());
 
         // Update
+        long newOwnerId = product.get().getOwnerUid() + 1;
         String newName = product.get().getName() + "_";
         String newDesc = product.get().getDescription() + "_";
         String newUrls = "test.test.test.test.example.com";
@@ -68,6 +69,7 @@ class DaoProductServiceImplTest {
         boolean hidden = !product.get().isHidden();
         boolean approved = !product.get().isApproved();
         double price = product.get().getPrice();
+        product.get().setOwnerUid(newOwnerId);
         product.get().setName(newName);
         product.get().setDescription(newDesc);
         product.get().setIconUrl(newUrls);
@@ -82,6 +84,7 @@ class DaoProductServiceImplTest {
         product = productService.getProductDetails(productId);
 
         assertTrue(product.isPresent());
+        assertEquals(product.get().getOwnerUid(), newOwnerId);
         assertEquals(product.get().getName(), newName);
         assertEquals(product.get().getDescription(), newDesc);
         assertEquals(product.get().getIconUrl(), newUrls);

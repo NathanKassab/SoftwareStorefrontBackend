@@ -102,6 +102,8 @@ public class DaoLicenseServiceImpl implements LicenseService {
 
     @Override
     public void deleteLicense(String license) throws LicenseServiceException {
+        Objects.requireNonNull(license);
+
         Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
         if (licenseModel.isEmpty())
             throw new LicenseServiceException("License does not exist", -1);
@@ -111,21 +113,29 @@ public class DaoLicenseServiceImpl implements LicenseService {
 
     @Override
     public Optional<LicenseDTO> getLicense(String license) {
+        Objects.requireNonNull(license);
+
         return licenseRepo.findLicenseModelByLicense(license).map(this::mapToDto);
     }
 
     @Override
     public void banLicense(String license) throws LicenseServiceException {
+        Objects.requireNonNull(license);
+
         setLicenseBanned(license, true);
     }
 
     @Override
     public void unbanLicense(String license) throws LicenseServiceException {
+        Objects.requireNonNull(license);
+
         setLicenseBanned(license, false);
     }
 
     @Override
     public boolean isLicenseBanned(String license) {
+        Objects.requireNonNull(license);
+
         Optional<LicenseDTO> dto = getLicense(license);
         return dto.isPresent() && dto.get().isBanned();
     }
@@ -137,6 +147,8 @@ public class DaoLicenseServiceImpl implements LicenseService {
      * @throws LicenseServiceException If something goes wrong while updating the license
      */
     private void setLicenseBanned(String license, boolean banned) throws LicenseServiceException{
+        Objects.requireNonNull(license);
+
         Optional<LicenseModel> licenseModel = licenseRepo.findLicenseModelByLicense(license);
         if (licenseModel.isEmpty())
             throw new LicenseServiceException("License does not exist", -1);
@@ -150,6 +162,7 @@ public class DaoLicenseServiceImpl implements LicenseService {
      * @return The DTO equivalent
      */
     private LicenseDTO mapToDto(LicenseModel model){
+        Objects.requireNonNull(model);
         return new LicenseDTO(model.getId(), model.getHolder(),
                 model.getProductId(), model.getLicense(), model.isBanned());
     }

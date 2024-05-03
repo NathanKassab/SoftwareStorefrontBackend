@@ -12,6 +12,7 @@
         <span>Email: </span><span style="color: var(--light-blue)" th:text="${userDto.getEmail()}"></span><br/>
         <span>Username: </span><span style="color: var(--light-blue)" th:text="${userDto.getUsername()}"></span><br/>
         <span>API Key: </span><span style="color: var(--light-blue)" th:text="${userDto.getApiKey() == null} ? 'null' : ${userDto.getApiKey()}"></span><form style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/genApiKey}"><button type="submit">Refresh</button></form><br/>
+        <span>HWID: </span><span style="color: var(--light-blue)" th:text="${userDto.getHwid() == null} ? 'null' : ${userDto.getHwid()}"></span><form sec:authorize="hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')" th:if="${userDto.getHwid() != null}" style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/resetHwid}"><button type="submit">Reset</button></form><br/>
         <span>Account expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isExpired()}"></span><br/>
         <span>Password expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isPasswordExpired()}"></span><br/>
         <span>Account locked: </span><span style="color: var(--light-blue)" th:text="${userDto.isLocked()}"></span><br/>
