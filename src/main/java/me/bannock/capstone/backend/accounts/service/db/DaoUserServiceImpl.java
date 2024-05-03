@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,13 @@ public class DaoUserServiceImpl implements UserService {
     private final KeyGenService keyGenService;
 
     @Value("${backend.userService.maxGenApiKeyTries}")
-    private int MAX_GEN_API_KEY_TRIES;
+    private int maxGenApiKeyTries;
 
     @Value("${backend.userService.autoVerifyEmails}")
     private boolean autoVerifyEmails;
+
+    @Value("${backend.userService.maxHwidSize}")
+    private int maxHwidSize;
 
     @Override
     public long login(String email, String password) throws UserServiceException {
@@ -51,7 +55,7 @@ public class DaoUserServiceImpl implements UserService {
         // extra details about failed logins
         Optional<AccountModel> user = userRepo.findAccountModelByEmail(email);
         if (user.isEmpty())
-            throw new UserServiceException("Could not find user account what matched email", -1);
+            throw new UserServiceException("Could not find user account that matched email", -1);
         if (!passwordEncoder.matches(password, user.get().getPassword()))
             throw new UserServiceException("Password is incorrect", user.get().getId());
 
@@ -131,7 +135,7 @@ public class DaoUserServiceImpl implements UserService {
         int attemptedTries = 0;
         do{
             newApiKey = this.keyGenService.generateNewKey();
-            if (attemptedTries++ >= MAX_GEN_API_KEY_TRIES)
+            if (attemptedTries++ >= maxGenApiKeyTries)
                 throw new UserServiceException("Couldn't generate a unique api key", uid);
         }while (userRepo.existsByApiKey(newApiKey));
 
@@ -140,7 +144,7 @@ public class DaoUserServiceImpl implements UserService {
         userRepo.saveAndFlush(user.get());
 
         logger.info("Genned a new API key for uid:{}, gennedAttempts:{}, maxGenAttempts={}, newApiKey={}",
-                uid, attemptedTries, MAX_GEN_API_KEY_TRIES, newApiKey);
+                uid, attemptedTries, maxGenApiKeyTries, newApiKey);
 
         return newApiKey;
     }
@@ -186,17 +190,15 @@ public class DaoUserServiceImpl implements UserService {
         Objects.requireNonNull(privilegeName);
 
         // We get the user first so we're able to pull and modify their privileges
-        Optional<AccountModel> user = userRepo.findAccountModelById(uid);
-        if (user.isEmpty())
-            throw new UserServiceException("User does not exist", uid);
+        AccountModel user = findUserByUid(uid);
 
-        ArrayList<String> privileges = user.get().getPrivileges();
+        ArrayList<String> privileges = user.getPrivileges();
         if (privileges == null)
             privileges = new ArrayList<>();
         privileges.add(privilegeName);
-        user.get().setPrivileges(privileges);
-        userRepo.saveAndFlush(user.get());
-        logger.info("Granted privilege to user, privilege={}, user={}", privilegeName, user.get());
+        user.setPrivileges(privileges);
+        userRepo.saveAndFlush(user);
+        logger.info("Granted privilege to user, privilege={}, user={}", privilegeName, user);
     }
 
     @Override
@@ -204,17 +206,15 @@ public class DaoUserServiceImpl implements UserService {
         Objects.requireNonNull(privilegeName);
 
         // We get the user first so we're able to pull and modify their privileges
-        Optional<AccountModel> user = userRepo.findAccountModelById(uid);
-        if (user.isEmpty())
-            throw new UserServiceException("User does not exist", uid);
+        AccountModel user = findUserByUid(uid);
 
-        ArrayList<String> privileges = user.get().getPrivileges();
+        ArrayList<String> privileges = user.getPrivileges();
         if (privileges == null)
             return;
         privileges.remove(privilegeName);
-        user.get().setPrivileges(privileges);
-        userRepo.saveAndFlush(user.get());
-        logger.info("Revoked privilege from user, privilege={}, user={}", privilegeName, user.get());
+        user.setPrivileges(privileges);
+        userRepo.saveAndFlush(user);
+        logger.info("Revoked privilege from user, privilege={}, user={}", privilegeName, user);
     }
 
     @Override
@@ -222,14 +222,57 @@ public class DaoUserServiceImpl implements UserService {
         Objects.requireNonNull(privilegeName);
 
         // We get the user first so we're able to pull and modify their privileges
-        Optional<AccountModel> user = userRepo.findAccountModelById(uid);
-        if (user.isEmpty())
-            throw new UserServiceException("User does not exist", uid);
+        AccountModel user = findUserByUid(uid);
 
-        ArrayList<String> privileges = user.get().getPrivileges();
+        ArrayList<String> privileges = user.getPrivileges();
         if (privileges == null)
             return false;
         return privileges.contains(privilegeName);
+    }
+
+    @Override
+    public void setHwid(long uid, @Nullable String newHwid) throws UserServiceException {
+        AccountModel user = findUserByUid(uid);
+        String oldHwid = user.getHwid();
+        user.setHwid(newHwid);
+        userRepo.saveAndFlush(user);
+        logger.info("Changed hwid of user, uid={}, oldHwid={}, newHwid={}", uid, oldHwid, newHwid);
+    }
+
+    @Override
+    public boolean doesHwidMatch(String hwid, long uid) throws UserServiceException {
+        Objects.requireNonNull(hwid);
+
+        AccountModel user = findUserByUid(uid);
+
+        // As documented, if we do not have any hwid stored, we should save the provided on to the
+        // user's account
+        if (user.getHwid() == null){
+            if (hwid.length() > maxHwidSize)
+                throw new UserServiceException("Hwid of size %s is too long. Max size is %s".formatted(hwid.length(), maxGenApiKeyTries), uid);
+            
+            user.setHwid(hwid);
+            userRepo.saveAndFlush(user);
+            return true;
+        }
+
+        boolean match = user.getHwid().equals(hwid);
+        if (!match)
+            logger.info("User's hwid did not match, uid={}. hwidOnAccount={}, badHwid={}", uid, user.getHwid(), hwid);
+        return user.getHwid().equals(hwid);
+    }
+
+    /**
+     * Attempts to get a user with their uid
+     * @param uid Their uid
+     * @return The user
+     * @throws UserServiceException If the user cannot be found
+     */
+    private AccountModel findUserByUid(long uid) throws UserServiceException {
+        Optional<AccountModel> user = userRepo.findAccountModelById(uid);
+        if (user.isEmpty())
+            throw new UserServiceException("User does not exist", uid);
+        return user.get();
     }
 
     /**
@@ -246,6 +289,7 @@ public class DaoUserServiceImpl implements UserService {
                 user.getUsername(),
                 user.getPassword(),
                 user.getApiKey(),
+                user.getHwid(),
                 !user.isEmailVerified(),
                 false, false,
                 user.isDisabled()

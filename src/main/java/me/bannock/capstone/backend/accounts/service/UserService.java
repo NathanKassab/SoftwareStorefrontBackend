@@ -1,5 +1,8 @@
 package me.bannock.capstone.backend.accounts.service;
 
+import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.Optional;
 
 public interface UserService {
@@ -101,5 +104,24 @@ public interface UserService {
      * @throws UserServiceException If something went wrong while checking fot the privilege
      */
     boolean hasPrivilege(long uid, String privilegeName) throws UserServiceException;
+
+    /**
+     * Sets a user's hwid
+     * @param uid The user's id
+     * @param newHwid Their new hwid
+     * @throws UserServiceException If something goes wrong while setting the user's hwid
+     */
+    @PreAuthorize("hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS') OR hasAuthority('PRIV_RESET_HWID') AND #newHwid == null")
+    void setHwid(long uid, @Nullable String newHwid) throws UserServiceException;
+
+    /**
+     * Checks if a user's hwid matches what we have stored. If there is no hwid stored, it will store
+     * the passed in hwid and save it as the user's hwid.
+     * @param hwid The hwid to check with
+     * @param uid The user's id
+     * @return Whether the provided hwid matches what's stored, or if we do not have any hwid stored
+     * @throws UserServiceException If something goes wrong while comparing the hwids
+     */
+    boolean doesHwidMatch(String hwid, long uid) throws UserServiceException;
 
 }

@@ -27,6 +27,7 @@ public class AccountModel {
         this.username = username;
         this.password = password;
         this.emailVerified = false;
+        this.hwid = null;
         this.disabled = false;
     }
 
@@ -50,6 +51,9 @@ public class AccountModel {
 
     @Column(name = "api_key")
     private String apiKey;
+
+    @Column(name = "hwid", length = 1024)
+    private String hwid;
 
     @Column(name = "privileges")
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
@@ -93,6 +97,14 @@ public class AccountModel {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public String getHwid() {
+        return hwid;
+    }
+
+    public void setHwid(String hwid) {
+        this.hwid = hwid;
     }
 
     public ArrayList<String> getPrivileges() {

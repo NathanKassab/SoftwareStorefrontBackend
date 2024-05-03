@@ -22,7 +22,17 @@ class DaoUserServiceImplTest {
     @Autowired
     private DaoUserServiceImpl userService;
 
-    private final String DEFAULT_TEST_PASSWORD = "test";
+    private final String DEFAULT_TEST_PASSWORD = "test", DEFAULT_TEST_HWID = "test";
+
+    @Test
+    @WithMockUser(authorities = {"PRIV_UPDATE_OWN_HWID", "PRIV_RESET_HWID"})
+    void testHwidFeatures() throws Exception {
+        Long uid = registerAndLogin();
+        assertTrue(userService.getAccountWithUid(uid).isPresent());
+        userService.setHwid(uid, DEFAULT_TEST_HWID);
+        assertTrue(userService.doesHwidMatch(DEFAULT_TEST_HWID, uid));
+        assertFalse(userService.doesHwidMatch(DEFAULT_TEST_HWID + "_", uid));
+    }
 
     @Test
     void getAccountDtoWithUid() throws Exception {

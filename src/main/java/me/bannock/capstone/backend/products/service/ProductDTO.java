@@ -109,4 +109,22 @@ public class ProductDTO {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return "ProductDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", iconUrl='" + iconUrl + '\'' +
+                ", purchaseUrl='" + purchaseUrl + '\'' +
+                ", description='" + description + '\'' +
+                ", keygenId='" + keygenId + '\'' +
+                ", ownerUid=" + ownerUid +
+                ", disabled=" + disabled +
+                ", hidden=" + hidden +
+                ", approved=" + approved +
+                ", price=" + price +
+                '}';
+    }
+
 }

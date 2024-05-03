@@ -18,7 +18,7 @@ class DaoLicenseServiceImplTest {
     private static final long TEST_PRODUCT_ID = 0;
 
     @Test
-    @WithMockUser(authorities = {"PRIV_BAN_ANY_LICENSE", "PRIV_BAN_OWN_PRODUCT_LICENSES", "PRIV_UNBAN_ANY_LICENSE",
+    @WithMockUser(authorities = {"PRIV_BAN_OWN_PRODUCT_LICENSES",
             "PRIV_UNBAN_OWN_PRODUCT_LICENSES", "PRIV_DEACTIVATE_LICENSE", "PRIV_ACTIVATE_LICENSE",
             "PRIV_CREATE_LICENSE", "PRIV_USE_OWN_LICENSES"})
     void testBanAndUnbanLicense() throws LicenseServiceException {

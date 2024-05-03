@@ -20,11 +20,11 @@ public enum Role {
             Privilege.PRIV_VIEW_OWN_PRODUCTS, Privilege.PRIV_BAN_OWN_PRODUCT_LICENSES, Privilege.PRIV_UNBAN_OWN_PRODUCT_LICENSES
     ),
     ROLE_MODERATOR(
-            Privilege.PRIV_LOGIN, Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_MAIN_APP_PANEL,
+            Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_MAIN_APP_PANEL,
             Privilege.PRIV_VIEW_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE
     ),
     ROLE_ADMINISTRATOR(
-            Privilege.PRIV_LOGIN, Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_USER_PRIVS,
+            Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_USER_PRIVS,
             Privilege.PRIV_MANAGE_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE
     );
 
