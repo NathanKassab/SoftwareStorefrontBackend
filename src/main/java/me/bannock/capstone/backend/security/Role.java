@@ -17,15 +17,18 @@ public enum Role {
     ROLE_MERCHANT(
             Privilege.PRIV_CREATE_LICENSE, Privilege.PRIV_DEACTIVATE_LICENSE, Privilege.PRIV_DELETE_LICENSE,
             Privilege.PRIV_MODIFY_PRODUCT_DETAILS, Privilege.PRIV_REGISTER_PRODUCT, Privilege.PRIV_USE_API,
-            Privilege.PRIV_VIEW_OWN_PRODUCTS, Privilege.PRIV_BAN_OWN_PRODUCT_LICENSES, Privilege.PRIV_UNBAN_OWN_PRODUCT_LICENSES
+            Privilege.PRIV_VIEW_API_KEY, Privilege.PRIV_VIEW_OWN_PRODUCTS, Privilege.PRIV_BAN_OWN_PRODUCT_LICENSES,
+            Privilege.PRIV_UNBAN_OWN_PRODUCT_LICENSES
     ),
     ROLE_MODERATOR(
             Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_MAIN_APP_PANEL,
-            Privilege.PRIV_VIEW_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE
+            Privilege.PRIV_VIEW_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE,
+            Privilege.PRIV_VIEW_API_KEY
     ),
     ROLE_ADMINISTRATOR(
             Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_VIEW_USER_PRIVS,
-            Privilege.PRIV_MANAGE_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE
+            Privilege.PRIV_MANAGE_USER_PRIVS, Privilege.PRIV_BAN_ANY_LICENSE, Privilege.PRIV_UNBAN_ANY_LICENSE,
+            Privilege.PRIV_VIEW_API_KEY
     );
 
     Role(Privilege... privileges){

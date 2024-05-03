@@ -1,18 +1,27 @@
 :root {
-    --light-blue: #a5e0fe;
-    --bnok-purple: #d58cff;
+    --accent-one: #0066ff;
+    --accent-two: #0066ff;
     --grey: #a5a5a5;
     --dark-grey: #656565;
-    --black: #1e1e1e;
+    --background: white;
+    --text: black;
 }
 
 body{
     margin: 0;
-    background-color: var(--black);
-    color: white;
+    background-color: var(--background);
+    color: var(--text);
     font-family: "Roboto", sans-serif;
     font-weight: 400;
     font-style: normal;
-    width: 100vw;
-    height: 100vh;
+    width: auto;
+    height: auto;
+}
+
+.hideText{
+    filter: blur(3px);
+}
+
+.hideText:focus, .hideText:hover{
+    overflow-x: hidden;
 }

@@ -37,11 +37,16 @@ public class ControlPanelController {
         pages.put("myAccount", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
         pages.put("modifyUserPrivileges", new Privilege[]{Privilege.PRIV_VIEW_USER_PRIVS});
         this.pages = pages;
+
+        Map<String, String[]> stylesheets = new LinkedHashMap<>();
+        stylesheets.put("myAccount", new String[]{"/resources/css/panel/myAccount.css"});
+        this.stylesheets = stylesheets;
     }
 
     private final Logger logger = LogManager.getLogger();
     private final UserService userService;
     private final Map<String, Privilege[]> pages;
+    private final Map<String, String[]> stylesheets;
 
     @GetMapping({"", "main", "main/", "main/{page}"})
     public String main(
@@ -81,6 +86,15 @@ public class ControlPanelController {
             logger.error("Could not find user account, sessionId={}, username={}",
                     request.getSession().getId(), SecurityContextHolder.getContext().getAuthentication().getName());
             throw new RuntimeException("Could not find user account");
+        }
+
+        // If the page is still not null by this point, it means
+        // the user is opening up a specific page. We need to inject the link
+        // to any stylesheets that may be linked with this page
+        if (page != null && stylesheets.containsKey(page)){
+            model.addAttribute("extraStylesheets", stylesheets.get(page));
+        }else{
+            model.addAttribute("extraStylesheets", null);
         }
 
         model.addAttribute("request", request);

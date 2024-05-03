@@ -5,23 +5,23 @@
 }
 
 .sideNavCurrentPage{
-    color: var(--bnok-purple);
+    color: var(--accent-one);
     text-decoration: none;
 }
 
 .sideNavCurrentPage:hover{
     text-decoration: underline;
-    text-decoration-color: var(--bnok-purple);
+    text-decoration-color: var(--accent-one);
 }
 
 .sideNavCurrentPage:focus{
     text-decoration: underline;
-    text-decoration-color: var(--light-blue);
-    color: var(--light-blue);
+    text-decoration-color: var(--accent-two);
+    color: var(--accent-two);
 }
 
 .sideNavPage{
-    color: white;
+    color: var(--text);
     text-decoration: none;
 }
 
@@ -31,5 +31,5 @@
 
 .sideNavPage:focus{
     text-decoration: underline;
-    text-decoration-color: var(--light-blue);
+    text-decoration-color: var(--accent-two);
 }

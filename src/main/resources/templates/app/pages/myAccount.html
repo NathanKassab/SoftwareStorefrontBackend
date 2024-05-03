@@ -6,36 +6,65 @@
 </head>
 <body>
 
-<div th:fragment="content">
-    <div style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
-        <span>User ID: </span><span style="color: var(--light-blue)" th:text="${userDto.getUid()}"></span><br/>
-        <span>Email: </span><span style="color: var(--light-blue)" th:text="${userDto.getEmail()}"></span><br/>
-        <span>Username: </span><span style="color: var(--light-blue)" th:text="${userDto.getUsername()}"></span><br/>
-        <span>API Key: </span><span style="color: var(--light-blue)" th:text="${userDto.getApiKey() == null} ? 'null' : ${userDto.getApiKey()}"></span><form style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/genApiKey}"><button type="submit">Refresh</button></form><br/>
-        <span>HWID: </span><span style="color: var(--light-blue)" th:text="${userDto.getHwid() == null} ? 'null' : ${userDto.getHwid()}"></span><form sec:authorize="hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')" th:if="${userDto.getHwid() != null}" style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/resetHwid}"><button type="submit">Reset</button></form><br/>
-        <span>Account expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isExpired()}"></span><br/>
-        <span>Password expired: </span><span style="color: var(--light-blue)" th:text="${userDto.isPasswordExpired()}"></span><br/>
-        <span>Account locked: </span><span style="color: var(--light-blue)" th:text="${userDto.isLocked()}"></span><br/>
-        <span>Account enabled: </span><span style="color: var(--light-blue)" th:text="${!userDto.isDisabled()}"></span><br/>
+<section th:fragment="content" style="background-color: var(--background); padding: 10px; margin: 2% 2% 2% 2%;">
+    <div class="aboutBox">
+        <label for="uidField">Account ID: </label>
+        <p>This is your account's unique id.</p>
+        <input type="text" id="uidField" readonly th:value="${userDto.getUid()}">
     </div>
-
+    <div class="aboutBox">
+        <label for="emailField">Email: </label>
+        <p>This is the email address used during sign up.</p>
+        <input type="text" id="emailField" readonly th:value="${userDto.getEmail()}">
+    </div>
+    <div class="aboutBox">
+        <label for="usernameField">Username: </label>
+        <p>This is the name that's shown to other users.</p>
+        <input type="text" id="usernameField" readonly th:value="${userDto.getUsername()}">
+    </div>
+    <div class="aboutBox" sec:authorize="!hasAuthority('PRIV_VIEW_API_KEY')">
+        <label>Remote login key: </label>
+        <p>There is a password used by your purchased software to access your account. <br/>If your computer gets infected with a virus, you can reset it here to protect yourself.</p>
+        <form method="POST" th:action="@{/app/myAccount/genApiKey}">
+            <button type="submit">Reset</button>
+        </form>
+        <br/>
+    </div>
+    <div class="aboutBox" sec:authorize="hasAuthority('PRIV_VIEW_API_KEY')">
+        <label for="apiKeyField">API Key: </label>
+        <p>Shown as "Remote login key" to other users. It's your API key.</p>
+        <input type="text" id="apiKeyField" readonly th:value="${userDto.getApiKey() == null} ? 'null' : ${userDto.getApiKey()}">
+        <form method="POST" th:action="@{/app/myAccount/genApiKey}">
+            <button type="submit">Reset</button>
+        </form>
+    </div>
+    <div class="aboutBox" th:if="${userDto.getHwid() != null}">
+        <label for="hwidField">Computer Identifier: </label>
+        <p sec:authorize="!hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')">You will only be able to run our software on the computer that matches this identifier. <br/>If you upgrade or buy a new computer, you will have to contact us to reset the identifier.</p>
+        <p sec:authorize="hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')">You will only be able to run our software on the computer that matches this identifier. <br/>If you upgrade or buy a new computer, you can reset the identifier here.</p>
+        <input type="text" id="hwidField" readonly th:value="${userDto.getHwid() == null} ? 'null' : ${userDto.getHwid()}">
+        <form sec:authorize="hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')" th:if="${userDto.getHwid() != null}" style="display: inline; margin-left: 6px" method="POST" th:action="@{/app/myAccount/resetHwid}">
+            <button type="submit">Reset</button>
+        </form>
+    </div>
+    <div class="aboutBox">
+        <label for="uidField">Account active: </label>
+        <p>Your account is active if your email is verified, your account isn't locked or disabled, <br/>and if your password isn't expired.</p>
+        <input type="checkbox" id="activeField" onclick="return false;" th:checked="${!userDto.isExpired() && !userDto.isPasswordExpired() && !userDto.isLocked() && !userDto.isDisabled()}">
+    </div>
     <!-- If permitted, the user will see a list of their own privileges in this menu -->
-    <div sec:authorize="hasAnyAuthority('PRIV_VIEW_OWN_PRIVS', 'PRIV_VIEW_USER_PRIVS')" style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
+    <div class="privilegeList" sec:authorize="hasAnyAuthority('PRIV_VIEW_OWN_PRIVS', 'PRIV_VIEW_USER_PRIVS')">
         <h1 style="margin-bottom: 0">Privileges: </h1>
         <small>(Relog to refresh privileges in portal)</small>
         <ul>
             <li th:each="priv : ${user.getAuthorities()}" th:text="${priv.getAuthority()}"></li>
         </ul>
     </div>
-
-    <div style="background-color: var(--black); padding: 20px; margin: 2% 10% 2% 10%; border-radius: 20px; border: 1px solid var(--bnok-purple)">
-        <form method="POST" th:action="@{/logout}">
-            <input type="submit" value="Log out">
-        </form>
-    </div>
-
-</div>
-
+    <br/>
+    <form method="POST" th:action="@{/logout}">
+        <input type="submit" value="Log out">
+    </form>
+</section>
 
 </body>
 </html>

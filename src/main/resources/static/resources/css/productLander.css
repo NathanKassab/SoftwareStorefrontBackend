@@ -1,13 +1,13 @@
 .purchaseButton{
-    background-color: var(--black);
-    color: white;
+    background-color: var(--background);
+    color: var(--text);
     padding: 10px;
-    border: 1px solid var(--bnok-purple);
+    border: 1px solid var(--accent-one);
     border-radius: 2px;
 }
 
 .purchaseButton:hover{
-    border-color: var(--light-blue);
+    border-color: var(--accent-two);
 }
 
 .purchaseContainer{
