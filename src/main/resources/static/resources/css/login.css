@@ -1,0 +1,22 @@
+.loginFormContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    font-size: 1.15em !important; /* We love !important */
+}
+
+.loginForm{
+    border: var(--accent-one) 1px solid;
+    border-radius: 0.5em;
+    padding: 2.5em;
+}
+
+.loginForm div{
+    padding: 0.5em
+}
+
+.loginForm input{
+    font-size: 1em;
+}

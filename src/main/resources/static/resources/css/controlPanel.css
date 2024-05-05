@@ -1,0 +1,31 @@
+.defaultPanelSectionStyle{
+    background-color: var(--background);
+    padding: 10px;
+    margin: 2% 2% 2% 2%;
+}
+
+.infoBox{
+    margin-bottom: 10px;
+    font-size: 1.25em;
+    width: 50%;
+}
+
+.infoBox p{
+    color: var(--grey);
+    font-size: 0.6em;
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+}
+
+.infoBox input{
+    color: var(--accent-two);
+    margin-bottom: 1em;
+}
+
+.hideText{
+    filter: blur(3px);
+}
+
+.hideText:focus, .hideText:hover{
+    filter: none;
+}

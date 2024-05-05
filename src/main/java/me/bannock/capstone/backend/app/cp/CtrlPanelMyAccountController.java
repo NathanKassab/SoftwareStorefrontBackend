@@ -1,4 +1,4 @@
-package me.bannock.capstone.backend.app;
+package me.bannock.capstone.backend.app.cp;
 
 import jakarta.servlet.http.HttpServletResponse;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;

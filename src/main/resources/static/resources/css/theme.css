@@ -3,7 +3,7 @@
     --accent-two: #0066ff;
     --grey: #a5a5a5;
     --dark-grey: #656565;
-    --background: white;
+    --background: #f0f0f0;
     --text: black;
 }
 
@@ -16,12 +16,4 @@ body{
     font-style: normal;
     width: auto;
     height: auto;
-}
-
-.hideText{
-    filter: blur(3px);
-}
-
-.hideText:focus, .hideText:hover{
-    overflow-x: hidden;
 }

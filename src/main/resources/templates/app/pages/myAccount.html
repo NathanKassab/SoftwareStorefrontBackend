@@ -2,43 +2,50 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/controlPanel.css}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<section th:fragment="content" style="background-color: var(--background); padding: 10px; margin: 2% 2% 2% 2%;">
-    <div class="aboutBox">
+<section th:fragment="content" class="defaultPanelSectionStyle">
+
+    <div class="infoBox">
         <label for="uidField">Account ID: </label>
         <p>This is your account's unique id.</p>
         <input type="text" id="uidField" readonly th:value="${userDto.getUid()}">
     </div>
-    <div class="aboutBox">
+
+    <div class="infoBox">
         <label for="emailField">Email: </label>
         <p>This is the email address used during sign up.</p>
         <input type="text" id="emailField" readonly th:value="${userDto.getEmail()}">
     </div>
-    <div class="aboutBox">
+
+    <div class="infoBox">
         <label for="usernameField">Username: </label>
         <p>This is the name that's shown to other users.</p>
         <input type="text" id="usernameField" readonly th:value="${userDto.getUsername()}">
     </div>
-    <div class="aboutBox" sec:authorize="!hasAuthority('PRIV_VIEW_API_KEY')">
-        <label>Remote login key: </label>
+
+    <div class="infoBox" sec:authorize="!hasAuthority('PRIV_VIEW_API_KEY')">
+        <label>Remote Login Key: </label>
         <p>There is a password used by your purchased software to access your account. <br/>If your computer gets infected with a virus, you can reset it here to protect yourself.</p>
         <form method="POST" th:action="@{/app/myAccount/genApiKey}">
             <button type="submit">Reset</button>
         </form>
         <br/>
     </div>
-    <div class="aboutBox" sec:authorize="hasAuthority('PRIV_VIEW_API_KEY')">
+
+    <div class="infoBox" sec:authorize="hasAuthority('PRIV_VIEW_API_KEY')">
         <label for="apiKeyField">API Key: </label>
-        <p>Shown as "Remote login key" to other users. It's your API key.</p>
+        <p>Shown as "Remote Login Key" to other users. It's your API key.</p>
         <input type="text" id="apiKeyField" readonly th:value="${userDto.getApiKey() == null} ? 'null' : ${userDto.getApiKey()}">
         <form method="POST" th:action="@{/app/myAccount/genApiKey}">
             <button type="submit">Reset</button>
         </form>
     </div>
-    <div class="aboutBox" th:if="${userDto.getHwid() != null}">
+
+    <div class="infoBox" th:if="${userDto.getHwid() != null}">
         <label for="hwidField">Computer Identifier: </label>
         <p sec:authorize="!hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')">You will only be able to run our software on the computer that matches this identifier. <br/>If you upgrade or buy a new computer, you will have to contact us to reset the identifier.</p>
         <p sec:authorize="hasAnyAuthority('PRIV_UPDATE_OWN_HWID', 'PRIV_UPDATE_USER_HWIDS', 'PRIV_RESET_HWID')">You will only be able to run our software on the computer that matches this identifier. <br/>If you upgrade or buy a new computer, you can reset the identifier here.</p>
@@ -47,20 +54,24 @@
             <button type="submit">Reset</button>
         </form>
     </div>
-    <div class="aboutBox">
-        <label for="uidField">Account active: </label>
+
+    <div class="infoBox">
+        <label for="uidField">Account Active: </label>
         <p>Your account is active if your email is verified, your account isn't locked or disabled, <br/>and if your password isn't expired.</p>
         <input type="checkbox" id="activeField" onclick="return false;" th:checked="${!userDto.isExpired() && !userDto.isPasswordExpired() && !userDto.isLocked() && !userDto.isDisabled()}">
+        <p style="display: inline" th:text="'Your account is ' + ${!userDto.isExpired() && !userDto.isPasswordExpired() && !userDto.isLocked() && !userDto.isDisabled() ? 'active' : 'inactive'}"></p>
     </div>
+
     <!-- If permitted, the user will see a list of their own privileges in this menu -->
-    <div class="privilegeList" sec:authorize="hasAnyAuthority('PRIV_VIEW_OWN_PRIVS', 'PRIV_VIEW_USER_PRIVS')">
-        <h1 style="margin-bottom: 0">Privileges: </h1>
-        <small>(Relog to refresh privileges in portal)</small>
-        <ul>
+    <div class="infoBox" sec:authorize="hasAnyAuthority('PRIV_VIEW_OWN_PRIVS', 'PRIV_VIEW_USER_PRIVS')">
+        <label style="margin-bottom: 0">Privileges: </label>
+        <p>Relog to refresh privileges in portal</p>
+        <ul style="font-size: 0.75em">
             <li th:each="priv : ${user.getAuthorities()}" th:text="${priv.getAuthority()}"></li>
         </ul>
     </div>
     <br/>
+
     <form method="POST" th:action="@{/logout}">
         <input type="submit" value="Log out">
     </form>

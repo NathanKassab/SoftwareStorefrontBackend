@@ -1,27 +1,29 @@
+.sideNavLinkContainer{
+    width: 100%;
+    height: 100%;
+    border-right: var(--grey) 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .sideNavLink{
     width: 100%;
-    margin: 2px;
-    font-size: 1.5em;
+    font-size: 1.15em;
+    display: inline-block;
 }
 
 .sideNavCurrentPage{
-    color: var(--accent-one);
+    color: var(--text);
     text-decoration: none;
 }
 
-.sideNavCurrentPage:hover{
+.sideNavCurrentPage:hover, .sideNavCurrentPage:focus{
     text-decoration: underline;
-    text-decoration-color: var(--accent-one);
-}
-
-.sideNavCurrentPage:focus{
-    text-decoration: underline;
-    text-decoration-color: var(--accent-two);
-    color: var(--accent-two);
 }
 
 .sideNavPage{
-    color: var(--text);
+    color: var(--dark-grey);
     text-decoration: none;
 }
 
@@ -29,7 +31,18 @@
     text-decoration: underline;
 }
 
-.sideNavPage:focus{
-    text-decoration: underline;
-    text-decoration-color: var(--accent-two);
+#sideNavTopHalf{
+    padding: 3% 0 3% 3%;
+}
+
+#sideNavBottomHalf{
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-top: var(--grey) 1px solid;
+}
+
+#sideNavBottomControlPane{
+    width: 100%;
+    height: 3em;
 }

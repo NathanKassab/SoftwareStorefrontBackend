@@ -3,15 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/login.css}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<form method="POST" th:action="@{/processLogin}">
-    <label for="email">Email</label><input type="text" name="email" id="email">
-    <label for="password">Password</label><input type="password" name="password" id="password">
-    <input type="submit">
-</form>
+<section class="loginFormContainer">
+    <form class="loginForm" method="POST" th:action="@{/processLogin}">
+        <h1>Login: </h1>
+        <div>
+            <label for="email">Email: </label>
+            <input type="text" name="email" id="email">
+        </div>
+        <div>
+            <label for="password">Password: </label>
+            <input type="password" name="password" id="password">
+        </div>
+        <div>
+            <input type="submit">
+        </div>
+    </form>
+</section>
 
 </body>
 </html>

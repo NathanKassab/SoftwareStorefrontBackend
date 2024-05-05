@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.security.Privilege;
+import me.bannock.capstone.backend.utils.ControllerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +35,13 @@ public class ControlPanelController {
         // This is a simple way of limiting some user to specific pages
         Map<String, Privilege[]> pages = new LinkedHashMap<>();
         pages.put("myAccount", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
-        pages.put("modifyUserPrivileges", new Privilege[]{Privilege.PRIV_VIEW_USER_PRIVS});
+        pages.put("products", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
+        pages.put("manageMyProducts", new Privilege[]{Privilege.PRIV_VIEW_OWN_PRODUCTS});
+        pages.put("registerNewProduct", new Privilege[]{Privilege.PRIV_REGISTER_PRODUCT});
         this.pages = pages;
 
         Map<String, String[]> stylesheets = new LinkedHashMap<>();
-        stylesheets.put("myAccount", new String[]{"/resources/css/panel/myAccount.css"});
+        stylesheets.put("products", new String[]{"/resources/css/panel/products.css"});
         this.stylesheets = stylesheets;
     }
 
@@ -68,7 +70,7 @@ public class ControlPanelController {
             page = null;
         }else{
             Privilege[] neededPrivs = this.pages.get(page);
-            if (!hasPrivs(neededPrivs)){
+            if (!ControllerUtils.hasPrivs(neededPrivs)){
                 logger.info("User attempted to open app " +
                         "page but lacked the needed privileges, user={}, sessionId={}, neededPrivs={}, page={}",
                         SecurityContextHolder.getContext().getAuthentication().getName(),
@@ -112,24 +114,11 @@ public class ControlPanelController {
     public List<String> getPagesUserCanAccess(){
         List<String> accessiblePages = new ArrayList<>();
         for (String page : this.pages.keySet()){
-            if (hasPrivs(this.pages.get(page))){
+            if (ControllerUtils.hasPrivs(this.pages.get(page))){
                 accessiblePages.add(page);
             }
         }
         return accessiblePages;
-    }
-
-    /**
-     * Checks if the currently logged-in user has a all the privileges in the provided array
-     * @param neededPrivs The provided array of privileges
-     * @return True if the user has all the listed privileges
-     */
-    public boolean hasPrivs(Privilege[] neededPrivs){
-        return Arrays.stream(neededPrivs).allMatch(priv -> {
-            return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(userPriv -> {
-                return userPriv.getAuthority().equals(priv.getPrivilege());
-            });
-        });
     }
 
 }

@@ -2,19 +2,18 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>User Control Panel</title>
+    <title th:text="${page == null} ? 'Control Panel - Nothing' : ${'Control Panel - ' + T(me.bannock.capstone.backend.utils.StringsUtils).convertCamelCaseToText(page)}"></title>
     <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/controlPanel.css}" rel="stylesheet">
     <link th:href="@{/resources/css/sideNav.css}" rel="stylesheet">
     <link th:each="stylesheet : ${extraStylesheets}" th:href="@{${stylesheet}}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="display: flex; justify-content: space-between;">
 
-<!--<p style="margin: 0;" th:if="${justLoggedIn}" th:text="${'Welcome back ' + user.getName() + '!'}"></p>-->
-
-<div id="sideNav" style="width: 20%; height: 100%; position: fixed;" th:insert="~{app/sideNav :: sideNav}"></div>
-<div id="sideNavSpacer" style="width: 20%; height: 100%;"></div>
-<div id="content" style="width: 80%; height: 100%"
+<div id="sideNav" style="width: 14%; height: 100%; position: fixed;" th:insert="~{app/sideNav :: sideNav}"></div>
+<div id="sideNavSpacer" style="width: 14%; height: 100%;"></div>
+<div id="content" style="width: 86%; height: 100%"
      th:insert="${page == null} ? ~{app/pages/void :: content} : ~{${'app/pages/' + page} :: content}"></div>
 
 </body>
