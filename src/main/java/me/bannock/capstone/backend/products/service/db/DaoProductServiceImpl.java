@@ -115,6 +115,12 @@ public class DaoProductServiceImpl implements ProductService {
         return productRepo.findProductModelsByOwnerUid(ownerId).stream().map(this::mapToDto).toList();
     }
 
+    @Override
+    public List<ProductDTO> getDisplayProducts() {
+        return productRepo.findProductModelsByDisabledIsFalseAndHiddenIsFalse()
+                .stream().map(this::mapToDto).toList();
+    }
+
     /**
      * Maps a product model to a DTO object
      * @param model The model to map

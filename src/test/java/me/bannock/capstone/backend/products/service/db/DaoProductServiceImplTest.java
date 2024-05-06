@@ -13,6 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,6 +39,11 @@ class DaoProductServiceImplTest {
 
     @Value("${backend.productService.maxKeygenIdLength}")
     private int maxKeygenIdLength;
+
+    @Test
+    void getDisplayProducts(){
+        assertNotNull(productService.getDisplayProducts());
+    }
 
     @Test
     @WithMockUser(authorities = {"PRIV_REGISTER_PRODUCT"})

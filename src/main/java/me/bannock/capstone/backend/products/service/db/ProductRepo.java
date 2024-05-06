@@ -13,4 +13,6 @@ public interface ProductRepo extends JpaRepository<ProductModel, Long> {
 
     List<ProductModel> findProductModelsByOwnerUid(long ownerUid);
 
+    List<ProductModel> findProductModelsByDisabledIsFalseAndHiddenIsFalse();
+
 }

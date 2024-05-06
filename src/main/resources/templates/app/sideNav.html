@@ -8,10 +8,18 @@
 
 <div th:fragment="sideNav" class="sideNavLinkContainer">
     <div id="sideNavTopHalf">
-        <div th:each="accessiblePage : ${sideBarPages}">
+        <div th:each="accessiblePage : ${sideNavPages}">
             <a th:href="${'/app/' + accessiblePage}"
                th:text="${T(me.bannock.capstone.backend.utils.StringsUtils).convertCamelCaseToText(accessiblePage)}"
                th:class="'sideNavLink ' + (${#strings.endsWith(request.getRequestURI(), accessiblePage)} ? 'sideNavCurrentPage' : 'sideNavPage')"></a>
+            <br/>
+        </div>
+        <hr/>
+        <strong>Products: </strong>
+        <div th:each="sideNavProduct : ${sideNavProducts}">
+            <a th:href="${'/app/product?productId=' + sideNavProduct.getId()}"
+               th:text="${sideNavProduct.getName()}"
+               th:class="'sideNavLink ' + (${product != null && sideNavProduct.getId() == product.getId()} ? 'sideNavCurrentPage' : 'sideNavPage')"></a>
             <br/>
         </div>
     </div>

@@ -40,4 +40,9 @@ public interface ProductService {
      */
     List<ProductDTO> getUsersProducts(long ownerId) throws ProductServiceException;
 
+    /**
+     * @return A list of products that are displayed to the user in different places
+     */
+    List<ProductDTO> getDisplayProducts();
+
 }

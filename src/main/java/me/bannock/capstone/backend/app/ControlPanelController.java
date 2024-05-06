@@ -43,7 +43,6 @@ public class ControlPanelController {
         // This is a simple way of limiting some user to specific pages
         Map<String, Privilege[]> pages = new LinkedHashMap<>();
         pages.put("myAccount", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
-        pages.put("products", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
         pages.put("manageMyProducts", new Privilege[]{Privilege.PRIV_VIEW_OWN_PRODUCTS});
         pages.put("registerNewProduct", new Privilege[]{Privilege.PRIV_REGISTER_PRODUCT});
         this.pages = pages;
@@ -106,8 +105,8 @@ public class ControlPanelController {
 
         // The sidebar is built using the mapping of pages we have in this class as well, so we
         // need to create a list of pages that the user is able to access
-        model.addAttribute("sideBarPages", getPagesUserCanAccess());
-        model.addAttribute("sideBarProducts", getProducts());
+        model.addAttribute("sideNavPages", getPagesUserCanAccess());
+        model.addAttribute("sideNavProducts", getProducts());
 
         Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if (userDto.isEmpty()){
@@ -176,8 +175,8 @@ public class ControlPanelController {
      * Gets a list of products that should be shown to the user on the sidebar
      * @return The list of products
      */
-    public List<String> getProducts(){
-        return new ArrayList<>();
+    public List<ProductDTO> getProducts(){
+        return productService.getDisplayProducts();
     }
 
     /**
