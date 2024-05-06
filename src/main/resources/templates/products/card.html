@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <link href="/resources/css/theme.css" rel="stylesheet">
-    <link href="/resources/css/productLander.css" rel="stylesheet">
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/productLander.css}" rel="stylesheet">
 </head>
 <div th:fragment="productCard" style="display: flex; justify-content: space-between">
     <div style="height: 100%; width: 75%; display: flex; flex-direction: column; align-items: flex-start;">

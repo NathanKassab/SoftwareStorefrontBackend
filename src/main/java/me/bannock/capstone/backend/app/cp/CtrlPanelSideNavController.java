@@ -1,8 +1,10 @@
 package me.bannock.capstone.backend.app.cp;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
+import me.bannock.capstone.backend.licensing.service.LicenseDTO;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Controller
@@ -35,14 +40,16 @@ public class CtrlPanelSideNavController {
     @PostMapping("activate")
     @Secured("PRIV_ACTIVATE_LICENSE")
     public ResponseEntity<?> activate(HttpServletRequest request,
-                                      @RequestParam(name = "license") String license){
+                                      HttpServletResponse response,
+                                      @RequestParam(name = "license") String license) throws IOException {
 
         // We need to get this user's uid to redeem a license, so we grab their account
         Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if (userDto.isEmpty()){
             logger.error("Could not find user account, sessionId={}, username={}",
                     request.getSession().getId(), SecurityContextHolder.getContext().getAuthentication().getName());
-            throw new RuntimeException("Could not find user account");
+            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Could not find user account", StandardCharsets.UTF_8)));
+            return ResponseEntity.badRequest().build();
         }
         AccountDTO user = userDto.get();
 
@@ -51,17 +58,23 @@ public class CtrlPanelSideNavController {
                     "Disabled user attempted to activate a license, userDisabled={}, userLocked={}, userExpiredPass={}, userExpired={}, user={}, sessionId={}",
                     user.isDisabled(), user.isLocked(), user.isPasswordExpired(), user.isExpired(), user, request.getSession().getId()
             );
-            return ResponseEntity.badRequest().body("Your account is not active");
+            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Your account is not active", StandardCharsets.UTF_8)));
+            return ResponseEntity.badRequest().build();
         }
 
         try {
             licenseService.activateLicense(user.getUid(), license);
+            Optional<LicenseDTO> licenseDto = licenseService.getLicense(license);
+            if (licenseDto.isEmpty())
+                throw new RuntimeException("Could not find license key after activating");
+            response.sendRedirect("/app/main/product?productId=%s".formatted(licenseDto.get().getHolderId()));
         } catch (LicenseServiceException e) {
             logger.warn("User was unable to activate license key, uid=%s, sessionId=%s".formatted(user.getUid(), request.getSession().getId()), e);
-            return ResponseEntity.internalServerError().body("Failed to activate license: %s".formatted(e.getErrorMessage()));
+            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Failed to activate license: %s".formatted(e.getErrorMessage()), StandardCharsets.UTF_8)));
+            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.status(205).build(); // http 205 is reset content
+        return ResponseEntity.status(205).build();
     }
 
 }

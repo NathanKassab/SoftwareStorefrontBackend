@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/resources/css/productCard.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<section th:fragment="content" class="defaultPanelSectionStyle">
+    <!-- Error if the product isn't available -->
+    <div th:if="${product == null}">
+        <h1 style="color: red;">Product is not available</h1>
+    </div>
+    <div th:if="${product != null}">
+        <div style="width: 50vw; height: 50vh; border: var(--accent-one) solid 1px; border-radius: 5px;" th:insert="~{products/card :: productCard}"></div>
+    </div>
+</section>
+
+</body>
+</html>

@@ -9,7 +9,7 @@ public enum Role {
     ),
     ROLE_USER(
             Privilege.PRIV_LOGIN, Privilege.PRIV_VIEW_MAIN_APP_PANEL, Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION,
-            Privilege.PRIV_VIEW_OWN_PRIVS, Privilege.PRIV_ACTIVATE_LICENSE
+            Privilege.PRIV_ACTIVATE_LICENSE, Privilege.PRIV_USE_OWN_LICENSES
     ),
     ROLE_SHOPPER(
             Privilege.PRIV_LAUNCH_LOADER, Privilege.PRIV_USE_API, Privilege.PRIV_GET_LICENSES
