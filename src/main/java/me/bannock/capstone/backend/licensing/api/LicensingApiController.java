@@ -38,6 +38,9 @@ public class LicensingApiController {
     @Secured("PRIV_ACTIVATE_LICENSE")
     public ResponseEntity<?> activateLicense(@RequestParam(name = "uid") long userId,
                                              @RequestParam(name = "license") String license){
+        // TODO: Add shopper roles on activation
+        // TODO: Validate that product can be redeemed at this time
+
         // We check that the user exists in our system as our
         // licensing service does not handle for that
         Optional<AccountDTO> account = userService.getAccountWithUid(userId);

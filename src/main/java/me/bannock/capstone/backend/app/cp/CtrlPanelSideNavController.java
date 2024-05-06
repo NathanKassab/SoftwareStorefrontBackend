@@ -42,6 +42,7 @@ public class CtrlPanelSideNavController {
     public ResponseEntity<?> activate(HttpServletRequest request,
                                       HttpServletResponse response,
                                       @RequestParam(name = "license") String license) throws IOException {
+        // TODO: Add shopper roles on activation
 
         // We need to get this user's uid to redeem a license, so we grab their account
         Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
