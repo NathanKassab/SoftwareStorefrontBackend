@@ -4,9 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
+import me.bannock.capstone.backend.accounts.service.UserServiceException;
 import me.bannock.capstone.backend.licensing.service.LicenseDTO;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
+import me.bannock.capstone.backend.security.Role;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +44,6 @@ public class CtrlPanelSideNavController {
     public ResponseEntity<?> activate(HttpServletRequest request,
                                       HttpServletResponse response,
                                       @RequestParam(name = "license") String license) throws IOException {
-        // TODO: Add shopper roles on activation
-
         // We need to get this user's uid to redeem a license, so we grab their account
         Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if (userDto.isEmpty()){
@@ -74,6 +74,18 @@ public class CtrlPanelSideNavController {
             response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Failed to activate license: %s".formatted(e.getErrorMessage()), StandardCharsets.UTF_8)));
             return ResponseEntity.badRequest().build();
         }
+
+        // Now that the license has been redeemed, we're also going to
+        // add shopper privileges to the user
+        Role.ROLE_SHOPPER.getPrivileges().forEach(priv -> {
+            if (user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals(priv.getPrivilege()))) {
+                try {
+                    userService.grantPrivilege(user.getUid(), priv.getPrivilege());
+                } catch (UserServiceException e) {
+                    logger.error("Failed to grant privilege to user, error={}, uid={}", e, user.getUid());
+                }
+            }
+        });
 
         return ResponseEntity.status(205).build();
     }
