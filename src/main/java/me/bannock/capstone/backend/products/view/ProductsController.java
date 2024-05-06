@@ -3,12 +3,14 @@ package me.bannock.capstone.backend.products.view;
 import jakarta.servlet.http.HttpServletRequest;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
+import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.products.service.ProductDTO;
 import me.bannock.capstone.backend.products.service.ProductService;
 import me.bannock.capstone.backend.products.service.ProductServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +24,16 @@ import java.util.Optional;
 public class ProductsController {
 
     @Autowired
-    public ProductsController(ProductService productService, UserService userService){
+    public ProductsController(ProductService productService, UserService userService, LicenseService licenseService){
         this.productService = productService;
         this.userService = userService;
+        this.licenseService = licenseService;
     }
 
     private final Logger logger = LogManager.getLogger();
     private final ProductService productService;
     private final UserService userService;
+    private final LicenseService licenseService;
 
     @GetMapping("view/{productId}")
     public String productLander(HttpServletRequest request,
@@ -71,6 +75,18 @@ public class ProductsController {
             return "products/unavailable";
         }
         model.addAttribute("owner", owner.get());
+
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()){
+            model.addAttribute("ownsProduct", false);
+        }else{
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            Optional<AccountDTO> currentUser = userService.getAccountWithUsername(username);
+            if (currentUser.isEmpty()){
+                logger.warn("Current user does not exist, username={}", username);
+                throw new RuntimeException("Current user does not exist, name=%s".formatted(username));
+            }
+            model.addAttribute("ownsProduct", licenseService.ownsProduct(currentUser.get().getUid(), productId));
+        }
 
         return "products/lander";
     }

@@ -9,7 +9,7 @@
 <div th:fragment="sideNav" class="sideNavLinkContainer">
     <div id="sideNavTopHalf">
         <div th:each="accessiblePage : ${sideBarPages}">
-            <a th:href="${'/app/main/' + accessiblePage}"
+            <a th:href="${'/app/' + accessiblePage}"
                th:text="${T(me.bannock.capstone.backend.utils.StringsUtils).convertCamelCaseToText(accessiblePage)}"
                th:class="'sideNavLink ' + (${#strings.endsWith(request.getRequestURI(), accessiblePage)} ? 'sideNavCurrentPage' : 'sideNavPage')"></a>
             <br/>
@@ -20,7 +20,7 @@
             <form style="height: 100%; width: 100%; display:flex; flex-direction: row; font-family: monospace;" method="POST" th:action="@{/app/sideNav/activate}" onsubmit="this.submit(); this.reset(); return false;">
                 <input type="text" name="license" placeholder="Redeem License Key" style="height: 100%; width: calc(100% - 3em);">
                 <button type="submit" style="height: 100%; width: 3em; display: flex; align-items: center;" class="btn btn-primary">
-                    <img src="/resources/img/app/submitLicenseKey.png" width="100%">
+                    <img src="/resources/img/app/submitLicenseKey.png" alt="Submit license icon" width="100%">
                 </button>
             </form>
         </div>

@@ -1,7 +1,6 @@
 package me.bannock.capstone.backend.app;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
@@ -51,7 +50,7 @@ public class ControlPanelController {
 
         // These pages are the same as the above ones, except they're not shown on the side nav
         Map<String, Privilege[]> unlistedPages = new LinkedHashMap<>();
-        unlistedPages.put(errorPage, new Privilege[0]);
+        unlistedPages.put(ERROR_PAGE, new Privilege[0]);
         unlistedPages.put("product", new Privilege[0]);
         this.unlistedPages = unlistedPages;
 
@@ -62,17 +61,16 @@ public class ControlPanelController {
     }
 
     private final Logger logger = LogManager.getLogger();
-    private final String errorPage = "error";
+    public static final String ERROR_PAGE = "error";
     private final UserService userService;
     private final ProductService productService;
     private final LicenseService licenseService;
     private final Map<String, Privilege[]> pages, unlistedPages;
     private final Map<String, String[]> stylesheets;
 
-    @GetMapping({"", "main", "main/", "main/{page}"})
+    @GetMapping({"", "main", "main/", "main/{page}", "{page}"})
     public String main(
             HttpServletRequest request,
-            HttpServletResponse response,
             @PathVariable(name = "page", required = false) String page,
             @RequestParam(name = "loggedIn", required = false, defaultValue = "false") boolean justLoggedIn,
             @RequestParam(name = "errorMessage", required = false) String errorMessage,
@@ -92,7 +90,7 @@ public class ControlPanelController {
                             "page that does not exist, user={}, sessionId={}, page={}",
                     SecurityContextHolder.getContext().getAuthentication().getName(),
                     request.getSession().getId(), page);
-            page = errorPage;
+            page = ERROR_PAGE;
             errorMessage = "Page does not exist";
         }else{
             Privilege[] neededPrivs = pages.get(page);
@@ -101,7 +99,7 @@ public class ControlPanelController {
                         "page but lacked the needed privileges, user={}, sessionId={}, neededPrivs={}, page={}",
                         SecurityContextHolder.getContext().getAuthentication().getName(),
                         request.getSession().getId(), neededPrivs, page);
-                page = errorPage;
+                page = ERROR_PAGE;
                 errorMessage = "You do not have the needed permissions to view this page";
             }
         }
@@ -121,9 +119,9 @@ public class ControlPanelController {
 
         if (productId != null){
             try{
-                populateProductInformation(request, response, model, productId, userDto.get());
+                populateProductInformation(request, model, productId, userDto.get());
             }catch (ProductServiceException e){
-                page = errorPage;
+                page = ERROR_PAGE;
                 errorMessage = e.getMessage();
             }
         }
@@ -148,13 +146,12 @@ public class ControlPanelController {
     /**
      * Populates the model with product information as needed
      * @param request The request
-     * @param response The response
      * @param model The model to populate
      * @param productId The product id
      * @param user The user requesting it
      * @throws ProductServiceException If something goes wrong while grabbing the product info
      */
-    private void populateProductInformation(HttpServletRequest request, HttpServletResponse response, Model model, long productId, AccountDTO user) throws ProductServiceException{
+    private void populateProductInformation(HttpServletRequest request, Model model, long productId, AccountDTO user) throws ProductServiceException{
         Optional<ProductDTO> productDto = productService.getProductDetails(productId);
 
         if (productDto.isEmpty() || productDto.get().isHidden() || productDto.get().isDisabled()){

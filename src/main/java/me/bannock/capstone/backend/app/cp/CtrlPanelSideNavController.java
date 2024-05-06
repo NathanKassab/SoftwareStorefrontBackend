@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.bannock.capstone.backend.accounts.service.AccountDTO;
 import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.accounts.service.UserServiceException;
+import me.bannock.capstone.backend.app.ControlPanelController;
 import me.bannock.capstone.backend.licensing.service.LicenseDTO;
 import me.bannock.capstone.backend.licensing.service.LicenseService;
 import me.bannock.capstone.backend.licensing.service.LicenseServiceException;
@@ -49,7 +50,7 @@ public class CtrlPanelSideNavController {
         if (userDto.isEmpty()){
             logger.error("Could not find user account, sessionId={}, username={}",
                     request.getSession().getId(), SecurityContextHolder.getContext().getAuthentication().getName());
-            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Could not find user account", StandardCharsets.UTF_8)));
+            response.sendRedirect("/app/" + ControlPanelController.ERROR_PAGE + "?errorMessage=%s".formatted(URLEncoder.encode("Could not find user account", StandardCharsets.UTF_8)));
             return ResponseEntity.badRequest().build();
         }
         AccountDTO user = userDto.get();
@@ -59,7 +60,7 @@ public class CtrlPanelSideNavController {
                     "Disabled user attempted to activate a license, userDisabled={}, userLocked={}, userExpiredPass={}, userExpired={}, user={}, sessionId={}",
                     user.isDisabled(), user.isLocked(), user.isPasswordExpired(), user.isExpired(), user, request.getSession().getId()
             );
-            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Your account is not active", StandardCharsets.UTF_8)));
+            response.sendRedirect("/app/" + ControlPanelController.ERROR_PAGE + "?errorMessage=%s".formatted(URLEncoder.encode("Your account is not active", StandardCharsets.UTF_8)));
             return ResponseEntity.badRequest().build();
         }
 
@@ -68,10 +69,10 @@ public class CtrlPanelSideNavController {
             Optional<LicenseDTO> licenseDto = licenseService.getLicense(license);
             if (licenseDto.isEmpty())
                 throw new RuntimeException("Could not find license key after activating");
-            response.sendRedirect("/app/main/product?productId=%s".formatted(licenseDto.get().getHolderId()));
+            response.sendRedirect("/app/product?productId=%s".formatted(licenseDto.get().getHolderId()));
         } catch (LicenseServiceException e) {
             logger.warn("User was unable to activate license key, uid=%s, sessionId=%s".formatted(user.getUid(), request.getSession().getId()), e);
-            response.sendRedirect("/app/main/error?errorMessage=%s".formatted(URLEncoder.encode("Failed to activate license: %s".formatted(e.getErrorMessage()), StandardCharsets.UTF_8)));
+            response.sendRedirect("/app/" + ControlPanelController.ERROR_PAGE + "?errorMessage=%s".formatted(URLEncoder.encode("Failed to activate license: %s".formatted(e.getErrorMessage()), StandardCharsets.UTF_8)));
             return ResponseEntity.badRequest().build();
         }
 
@@ -87,6 +88,7 @@ public class CtrlPanelSideNavController {
             }
         });
 
+        logger.info("User has activated license key, uid={}, license={}", user.getUid(), license);
         return ResponseEntity.status(205).build();
     }
 

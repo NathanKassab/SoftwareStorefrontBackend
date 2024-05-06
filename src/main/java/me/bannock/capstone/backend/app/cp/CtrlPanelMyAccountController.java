@@ -30,7 +30,7 @@ public class CtrlPanelMyAccountController {
     }
 
     private final Logger logger = LogManager.getLogger();
-    private final String PAGE_PATH = "/app/main/myAccount";
+    private final String PAGE_PATH = "/app/myAccount";
     private final UserService userService;
 
     @PostMapping("genApiKey")
