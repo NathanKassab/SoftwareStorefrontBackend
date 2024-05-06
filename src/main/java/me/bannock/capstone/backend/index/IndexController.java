@@ -4,7 +4,6 @@ import me.bannock.capstone.backend.accounts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,26 +22,29 @@ public class IndexController {
     private final UserService userService;
 
     @GetMapping("helloWorld")
-    public String helloWorld(Model model){
+    public String helloWorld(){
         return "helloWorld";
     }
 
     @GetMapping("login")
-    public String login(Model model){
+    public String login(){
         return "login";
     }
 
     @GetMapping("register")
-    public String register(Model model){
+    public String register(){
         return "register";
     }
 
     @PostMapping("register")
     @ResponseBody
-    public ResponseEntity<String> processRegister(Model model,
-                                                  @RequestParam(name = "username") String username,
+    public ResponseEntity<String> processRegister(@RequestParam(name = "username") String username,
                                                   @RequestParam(name = "email") String email,
-                                                  @RequestParam(name = "password") String password) {
+                                                  @RequestParam(name = "password") String password,
+                                                  @RequestParam(name = "confirmPassword") String confirmPassword) {
+        if (!password.equals(confirmPassword)){
+            return ResponseEntity.badRequest().body("Passwords do not match");
+        }
         try{
             userService.register(email, username, password);
         }catch (Exception e){
