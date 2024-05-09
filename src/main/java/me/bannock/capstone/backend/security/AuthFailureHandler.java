@@ -13,10 +13,7 @@ public class AuthFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        response.sendRedirect("/login?failed=true&error=%s".formatted(
-                        UriUtils.encodeQueryParam(exception.getMessage(), response.getCharacterEncoding())
-                )
-        );
+        response.sendRedirect("/login?error=%s".formatted(UriUtils.encodeQueryParam(exception.getMessage(), response.getCharacterEncoding())));
     }
 
 }

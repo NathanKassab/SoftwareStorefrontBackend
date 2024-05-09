@@ -13,7 +13,7 @@
     </div>
     <div style="height: 100%; width: 25%; display: flex; justify-content: flex-end;">
         <!-- User view (to actual download link) -->
-        <a class="purchaseContainer" sec:authorize="isAuthenticated()" th:href="${ownsProduct} ? '/app/loader' : ${product.getPurchaseUrl()}">
+        <a class="purchaseContainer" sec:authorize="isAuthenticated()" target="_blank" th:href="${ownsProduct} ? '/app/downloadLoader' : ${product.getPurchaseUrl()}">
             <button class="purchaseButton" th:if="${!ownsProduct}">Purchase</button>
             <button class="purchaseButton" th:if="${ownsProduct}">Download loader</button>
         </a>

@@ -69,7 +69,7 @@ public class CtrlPanelSideNavController {
             Optional<LicenseDTO> licenseDto = licenseService.getLicense(license);
             if (licenseDto.isEmpty())
                 throw new RuntimeException("Could not find license key after activating");
-            response.sendRedirect("/app/product?productId=%s".formatted(licenseDto.get().getHolderId()));
+            response.sendRedirect("/app/product?productId=%s".formatted(licenseDto.get().getProductId()));
         } catch (LicenseServiceException e) {
             logger.warn("User was unable to activate license key, uid=%s, sessionId=%s".formatted(user.getUid(), request.getSession().getId()), e);
             response.sendRedirect("/app/" + ControlPanelController.ERROR_PAGE + "?errorMessage=%s".formatted(URLEncoder.encode("Failed to activate license: %s".formatted(e.getErrorMessage()), StandardCharsets.UTF_8)));
@@ -87,6 +87,14 @@ public class CtrlPanelSideNavController {
                 }
             }
         });
+        if (user.getApiKey() == null) {
+            try {
+                userService.genApiKey(user.getUid());
+            } catch (UserServiceException e) {
+                logger.error("Failed to generate new api key for user. They may not be able to use the loader at this time. error={}, uid={}",
+                        e.getErrorMessage(), user.getUid());
+            }
+        }
 
         logger.info("User has activated license key, uid={}, license={}", user.getUid(), license);
         return ResponseEntity.status(205).build();

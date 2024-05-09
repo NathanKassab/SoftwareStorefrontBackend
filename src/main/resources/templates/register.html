@@ -12,6 +12,7 @@
 <section class="loginFormContainer">
     <form class="loginForm" method="POST" th:action="@{/register}">
         <h1>Register: </h1>
+        <pre style="color: red; white-space: pre-wrap; width: 100%;" th:if="${error != null}" th:text="${error}"></pre>
         <div>
             <label for="email">Email: </label><br/>
             <input type="text" name="email" id="email">

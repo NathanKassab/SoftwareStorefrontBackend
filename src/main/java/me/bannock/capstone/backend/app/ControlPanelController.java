@@ -43,6 +43,7 @@ public class ControlPanelController {
         // This is a simple way of limiting some user to specific pages
         Map<String, Privilege[]> pages = new LinkedHashMap<>();
         pages.put("myAccount", new Privilege[]{Privilege.PRIV_VIEW_OWN_ACCOUNT_INFORMATION});
+        pages.put("downloadLoader", new Privilege[]{Privilege.PRIV_LAUNCH_LOADER});
         pages.put("manageMyProducts", new Privilege[]{Privilege.PRIV_VIEW_OWN_PRODUCTS});
         pages.put("registerNewProduct", new Privilege[]{Privilege.PRIV_REGISTER_PRODUCT});
         this.pages = pages;

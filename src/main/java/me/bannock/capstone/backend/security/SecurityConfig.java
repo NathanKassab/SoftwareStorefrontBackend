@@ -21,7 +21,7 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
     @Bean
@@ -51,7 +51,7 @@ public class SecurityConfig {
                                                     AccessDeniedHandler accessDeniedHandler,
                                                     UserService userService, UserDetailsService userDetailsService) throws Exception {
         security.authorizeHttpRequests(authManagerRegistry -> authManagerRegistry.requestMatchers(
-                "/", "/helloWorld", "/logout*", "/register", "/api/licensing/1/generate/**",
+                "/", "/helloWorld", "/logout*", "/register", "/login", "/api/licensing/1/generate/**",
                 "/products/**", "/resources/**"
         ).permitAll().anyRequest().authenticated());
 

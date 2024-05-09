@@ -9,5 +9,6 @@ public class WatermarkerConfigGroup extends ConfigurationGroup {
     // for the specific job it wants to run
     public final static ConfigKeyString API_KEY = new ConfigKeyString("API key", "");
     public final static ConfigKeyString UID = new ConfigKeyString("uid", "");
+    public final static ConfigKeyString AUTH_SERVER_IP = new ConfigKeyString("Auth server ip", "");
 
 }

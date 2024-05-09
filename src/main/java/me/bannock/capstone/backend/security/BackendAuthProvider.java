@@ -1,6 +1,7 @@
 package me.bannock.capstone.backend.security;
 
 import me.bannock.capstone.backend.accounts.service.UserService;
+import me.bannock.capstone.backend.accounts.service.UserServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class BackendAuthProvider implements AuthenticationProvider {
         long userId;
         try {
             userId = userService.login(authentication.getName(), authentication.getCredentials().toString());
-        } catch (Exception e) {
+        } catch (UserServiceException e) {
             logger.info("Failed to authenticate user", e);
-            throw new AuthenticationException(e.getMessage()) {};
+            throw new AuthenticationException(e.getErrorMessage()) {};
         }
 
         // We need to get a user details object from the user details service so we can create an auth token

@@ -58,6 +58,9 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
     @Value("${backend.loader.protService.timeoutMillis}")
     private long timeoutMillis;
 
+    @Value("${backend.loader.authServerIp}")
+    private String authServerIp;
+
     private final Injector obfuscatorInjector;
     private final Obfuscator obfuscator;
     private final ObfuscatorJobFactory jobFactory;
@@ -96,6 +99,7 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         // we set these specific values in the config
         WatermarkerConfigGroup.API_KEY.setString(config, apiKey);
         WatermarkerConfigGroup.UID.setString(config, uid + "");
+        WatermarkerConfigGroup.AUTH_SERVER_IP.setString(config, authServerIp);
 
         String jobId = "job-%s".formatted(System.currentTimeMillis());
         if (this.jobs.containsKey(jobId))

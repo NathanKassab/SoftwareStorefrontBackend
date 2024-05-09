@@ -12,6 +12,8 @@
 <section class="loginFormContainer">
     <form class="loginForm" method="POST" th:action="@{/processLogin}">
         <h1>Login: </h1>
+        <pre style="color: red; white-space: pre-wrap; width: 100%;" th:if="${error != null}" th:text="${error}"></pre>
+        <pre style="color: green; white-space: pre-wrap; width: 100%;" th:if="${notice != null}" th:text="${notice}"></pre>
         <div>
             <label for="email">Email: </label><br/>
             <input type="text" name="email" id="email">

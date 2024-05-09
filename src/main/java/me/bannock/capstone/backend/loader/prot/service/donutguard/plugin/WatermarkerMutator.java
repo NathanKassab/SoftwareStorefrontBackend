@@ -15,8 +15,9 @@ public class WatermarkerMutator extends Mutator {
         this.config = config;
     }
 
-    private final static String API_KEY_PLACEHOLDER = "%%API_KEY%%";
-    private final static String UID_PLACEHOLDER = "%%UID%%";
+    private final static String API_KEY_PLACEHOLDER = "BNOK_%%API_KEY%%";
+    private final static String UID_PLACEHOLDER = "BNOK_%%UID%%";
+    private final static String AUTH_IP_PLACEHOLDER = "BNOK_%%AUTH_IP%%";
 
     private final Configuration config;
 
@@ -30,8 +31,10 @@ public class WatermarkerMutator extends Mutator {
                 return;
             if (ldc.cst.equals(API_KEY_PLACEHOLDER))
                 ldc.cst = WatermarkerConfigGroup.API_KEY.getString(config);
-            if (ldc.cst.equals(UID_PLACEHOLDER))
+            else if (ldc.cst.equals(UID_PLACEHOLDER))
                 ldc.cst = WatermarkerConfigGroup.UID.getString(config);
+            else if (ldc.cst.equals(AUTH_IP_PLACEHOLDER))
+                ldc.cst = WatermarkerConfigGroup.AUTH_SERVER_IP.getString(config);
         });
     }
 }
