@@ -38,6 +38,8 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         this.obfuscator = obfuscatorInjector.getInstance(Obfuscator.class);
         this.jobFactory = obfuscatorInjector.getInstance(ObfuscatorJobFactory.class);
         this.jobs = new HashMap<>();
+        this.uidJobCache = new HashMap<>();
+        this.idsToUidsMappings = new HashMap<>();
 
         // Due to a bug, a configuration must be created using the injector to ensure
         // the groups are loaded correctly
@@ -65,22 +67,31 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
     private final Obfuscator obfuscator;
     private final ObfuscatorJobFactory jobFactory;
     private final Map<String, ObfuscatorJob> jobs;
+    private final Map<Long, String> uidJobCache;
+    private final Map<String, Long> idsToUidsMappings;
     private final Timer timer = new Timer();
 
     @Override
     public LoaderProtJobDto startLoaderCreationJob(String apiKey, long uid) throws LoaderProtServiceException {
         Objects.requireNonNull(apiKey);
 
+        // Cache to ensure users don't run a million obfuscation jobs
+        if (uidJobCache.containsKey(uid)){
+            String cachedId = uidJobCache.get(uid);
+            ObfuscatorJob cachedJob = jobs.get(cachedId);
+            new LoaderProtJobDto(cachedId, uid, obfuscator.getJobStatus(cachedJob).getFriendlyName(), cachedId);
+        }
+
         File configFile = new File(configFilePath);
         if (!configFile.exists()){
             logger.error("Config file does not exist, cfgPath={}", configFilePath);
-            try { // In this case we generate a fresh configuration
+            try { // In this case we attempt to generate a fresh configuration
                 Configuration newConfig = obfuscatorInjector.getInstance(Configuration.class);
                 DefaultConfigGroup.INPUT.setFile(newConfig, new File(defaultUnprotectedLoaderPath));
                 configFile.getParentFile().mkdirs(); // To ensure the parent dir exists
                 Files.write(configFile.toPath(), ConfigurationUtils.getConfigBytes(newConfig));
             } catch (IOException e) {
-                logger.warn("Unable to write default DonutGuard configuration", e);
+                logger.warn("Failed to write default DonutGuard configuration", e);
                 throw new LoaderProtServiceException("Config file does not exist", null);
             }
         }
@@ -101,7 +112,7 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         WatermarkerConfigGroup.UID.setString(config, uid + "");
         WatermarkerConfigGroup.AUTH_SERVER_IP.setString(config, authServerIp);
 
-        String jobId = "job-%s".formatted(System.currentTimeMillis());
+        String jobId = "loader-%s".formatted(System.currentTimeMillis());
         if (this.jobs.containsKey(jobId))
             throw new LoaderProtServiceException("Key already exists in system", jobId);
 
@@ -112,6 +123,8 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         ObfuscatorJob job = jobFactory.create(config, new WatermarkerModule());
         obfuscator.submitJob(job);
         this.jobs.put(jobId, job);
+        this.uidJobCache.put(uid, jobId);
+        this.idsToUidsMappings.put(jobId, uid);
 
         // We need to schedule a timeout for later that will remove the job as well as its output file.
         // The reason for this is that this assists with cleanup and also ensures threads on the
@@ -119,6 +132,8 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         TimerTask timeoutTask = new TimerTask() {
             @Override
             public void run() {
+                uidJobCache.remove(uid);
+                idsToUidsMappings.remove(jobId);
                 obfuscator.removeJob(job);
                 if (outputFile.exists())
                     outputFile.delete();
@@ -130,13 +145,18 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
     }
 
     @Override
-    public Optional<String> getJobStatus(String id) {
+    public Optional<LoaderProtJobDto> getJobDto(String id) {
         Objects.requireNonNull(id);
         if (!this.jobs.containsKey(id))
             return Optional.empty();
 
         ObfuscatorJob job = jobs.get(id);
-        return Optional.of(obfuscator.getJobStatus(job).getFriendlyName());
+        return Optional.of(new LoaderProtJobDto(id, idsToUidsMappings.get(id), obfuscator.getJobStatus(job).getFriendlyName(), id));
+    }
+
+    @Override
+    public Optional<String> getJobStatus(String id) {
+        return getJobDto(id).map(LoaderProtJobDto::getState);
     }
 
     @Override
@@ -151,6 +171,15 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
             return Optional.of(output);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public boolean canUserAccessJob(long uid, String jobId) {
+        Objects.requireNonNull(jobId);
+
+        if (!this.idsToUidsMappings.containsKey(jobId))
+            return false;
+        return idsToUidsMappings.get(jobId) == uid;
     }
 
     /**

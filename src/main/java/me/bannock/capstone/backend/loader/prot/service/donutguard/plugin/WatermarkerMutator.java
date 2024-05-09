@@ -15,9 +15,9 @@ public class WatermarkerMutator extends Mutator {
         this.config = config;
     }
 
-    private final static String API_KEY_PLACEHOLDER = "BNOK_%%API_KEY%%";
-    private final static String UID_PLACEHOLDER = "BNOK_%%UID%%";
-    private final static String AUTH_IP_PLACEHOLDER = "BNOK_%%AUTH_IP%%";
+    public final static String API_KEY_PLACEHOLDER = "BNOK_%%API_KEY%%";
+    public final static String UID_PLACEHOLDER = "BNOK_%%UID%%";
+    public final static String AUTH_IP_PLACEHOLDER = "BNOK_%%AUTH_IP%%";
 
     private final Configuration config;
 

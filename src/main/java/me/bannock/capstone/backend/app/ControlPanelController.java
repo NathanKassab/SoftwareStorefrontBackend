@@ -109,7 +109,7 @@ public class ControlPanelController {
         model.addAttribute("sideNavPages", getPagesUserCanAccess());
         model.addAttribute("sideNavProducts", getProducts());
 
-        Optional<AccountDTO> userDto = userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        Optional<AccountDTO> userDto = ControllerUtils.getUserDtoFromAuthenticatedRequest(userService);
         if (userDto.isEmpty()){
             logger.error("Could not find user account, sessionId={}, username={}",
                     request.getSession().getId(), SecurityContextHolder.getContext().getAuthentication().getName());

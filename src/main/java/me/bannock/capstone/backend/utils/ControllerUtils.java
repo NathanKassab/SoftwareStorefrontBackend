@@ -1,9 +1,12 @@
 package me.bannock.capstone.backend.utils;
 
+import me.bannock.capstone.backend.accounts.service.AccountDTO;
+import me.bannock.capstone.backend.accounts.service.UserService;
 import me.bannock.capstone.backend.security.Privilege;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class ControllerUtils {
 
@@ -18,6 +21,15 @@ public class ControllerUtils {
                 return userPriv.getAuthority().equals(priv.getPrivilege());
             });
         });
+    }
+
+    /**
+     * Gets a user dto using the name data held in the auth token
+     * @param userService The user service to use when looking the user up
+     * @return The user dto, if it could be found.
+     */
+    public static Optional<AccountDTO> getUserDtoFromAuthenticatedRequest(UserService userService){
+        return userService.getAccountWithUsername(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
 }

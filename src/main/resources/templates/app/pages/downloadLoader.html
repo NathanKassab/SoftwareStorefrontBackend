@@ -9,7 +9,12 @@
 
 <section th:fragment="content" class="defaultPanelSectionStyle">
     <noscript>Please enabled javascript to download our loader</noscript>
-    <button>Download loader</button>
+    <script>
+        function downloadLoader(){
+            document.getElementById("downloadLoaderButton").hidden = true;
+        }
+    </script>
+    <button onclick="downloadLoader()" id="downloadLoaderButton">Download loader</button>
 </section>
 
 </body>

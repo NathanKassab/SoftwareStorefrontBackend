@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.io.File;
 import java.util.Optional;
@@ -24,6 +25,7 @@ class DonutGuardLoaderProtServiceImplTest {
     private static final long TEST_UID = 0;
 
     @Test
+    @WithMockUser(username = "admin", authorities = {"PRIV_LAUNCH_LOADER"})
     void startLoaderCreationJob() {
         LoaderProtJobDto dto = loaderProtService.startLoaderCreationJob(TEST_API_KEY, TEST_UID);
         Optional<File> output;
@@ -35,6 +37,7 @@ class DonutGuardLoaderProtServiceImplTest {
             logger.info("Current state of test job: {}", loaderProtService.getJobStatus(dto.getId()));
         }while(output.isEmpty());
         assertTrue(output.get().exists());
+        assertTrue(loaderProtService.getJobDto(dto.getId()).isPresent());
     }
 
 }

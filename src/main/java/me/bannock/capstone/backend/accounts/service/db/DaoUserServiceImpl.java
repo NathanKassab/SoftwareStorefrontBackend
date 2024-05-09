@@ -195,7 +195,8 @@ public class DaoUserServiceImpl implements UserService {
         ArrayList<String> privileges = user.getPrivileges();
         if (privileges == null)
             privileges = new ArrayList<>();
-        privileges.add(privilegeName);
+        if (!privileges.contains(privilegeName))
+            privileges.add(privilegeName);
         user.setPrivileges(privileges);
         userRepo.saveAndFlush(user);
         logger.info("Granted privilege to user, privilege={}, user={}", privilegeName, user);
