@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,6 +89,12 @@ public class CtrlPanelSideNavController {
                 }
             }
         });
+
+        // Refreshes privs on app without the need to relog
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
         if (user.getApiKey() == null) {
             try {
                 userService.genApiKey(user.getUid());

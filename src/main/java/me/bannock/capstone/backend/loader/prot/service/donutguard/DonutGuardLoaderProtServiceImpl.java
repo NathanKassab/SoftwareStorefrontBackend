@@ -60,6 +60,9 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
     @Value("${backend.loader.protService.timeoutMillis}")
     private long timeoutMillis;
 
+    @Value("${backend.loader.protService.deleteFilesOnTimeout}")
+    private boolean deleteFilesOnTimeout;
+
     @Value("${backend.loader.authServerIp}")
     private String authServerIp;
 
@@ -79,7 +82,7 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         if (uidJobCache.containsKey(uid)){
             String cachedId = uidJobCache.get(uid);
             ObfuscatorJob cachedJob = jobs.get(cachedId);
-            new LoaderProtJobDto(cachedId, uid, obfuscator.getJobStatus(cachedJob).getFriendlyName(), cachedId);
+            return new LoaderProtJobDto(cachedId, uid, obfuscator.getJobStatus(cachedJob).getFriendlyName(), cachedId);
         }
 
         File configFile = new File(configFilePath);
@@ -118,7 +121,10 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
 
         File outputFile = getOutputFile(jobId);
         outputFile.getParentFile().mkdirs(); // To ensure the parent dir exists
-        outputFile.deleteOnExit();
+        // TODO: This is a memory leak, and if you disable delete on timeout, it becomes a storage leak.
+        //  We need a more graceful way to handle this
+        if (deleteFilesOnTimeout)
+            outputFile.deleteOnExit();
         DefaultConfigGroup.OUTPUT.setFile(config, outputFile);
         ObfuscatorJob job = jobFactory.create(config, new WatermarkerModule());
         obfuscator.submitJob(job);
@@ -135,7 +141,7 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
                 uidJobCache.remove(uid);
                 idsToUidsMappings.remove(jobId);
                 obfuscator.removeJob(job);
-                if (outputFile.exists())
+                if (outputFile.exists() && deleteFilesOnTimeout)
                     outputFile.delete();
             }
         };

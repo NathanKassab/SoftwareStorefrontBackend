@@ -4,17 +4,72 @@
     <link th:href="@{/resources/css/theme.css}" rel="stylesheet">
     <link th:href="@{/resources/css/controlPanel.css}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 
 <section th:fragment="content" class="defaultPanelSectionStyle">
     <noscript>Please enabled javascript to download our loader</noscript>
     <script>
-        function downloadLoader(){
+        function getCsrfHeaders(){
+            let header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+            let token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+
+            let headers = new Headers();
+            headers.append(header, token);
+            return headers;
+        }
+
+        function updateMessage(error, redText){
+            let errorDisplay = document.getElementById("errorDisplay");
+            errorDisplay.hidden = false;
+            errorDisplay.textContent = error;
+            errorDisplay.setAttribute("style", redText ? "color: red;" : "");
+        }
+
+        async function buildLoader() {
+            let buildRequest = await fetch("/app/downloadLoader/build", {
+                method: "POST",
+                headers: getCsrfHeaders()
+            });
+            if (buildRequest.status !== 200){
+                updateMessage(buildRequest.text(), true);
+                return;
+            }
+            updateMessage("Building your loader...", false);
+            return buildRequest.text();
+        }
+
+        async function checkLoaderStatus(jobId, intervalId){
+            let buildRequest = await fetch("/app/downloadLoader/status/" + jobId, {
+                method: "GET"
+            });
+            if (buildRequest.status !== 202 && buildRequest.status !== 200){ // 202 is accepted
+                updateMessage(buildRequest.status + " " + await buildRequest.text(), true);
+                return;
+            }
+
+            if (buildRequest.status === 202){
+                updateMessage(buildRequest.text(), false);
+                return;
+            }
+
+            clearInterval(intervalId)
+            updateMessage("Downloading loader...", false);
+            window.location.href = "/app/downloadLoader/download/" + jobId;
+        }
+
+        async function downloadLoader(){
             document.getElementById("downloadLoaderButton").hidden = true;
+            let jobId = await buildLoader();
+            let intervalId = setInterval(await function(){
+                return checkLoaderStatus(jobId, intervalId);
+            }, 250)
         }
     </script>
     <button onclick="downloadLoader()" id="downloadLoaderButton">Download loader</button>
+    <pre hidden="true" id="errorDisplay" style="color: red;"></pre>
 </section>
 
 </body>
