@@ -69,7 +69,7 @@
             let jobId = await buildLoader();
             let intervalId = setInterval(await function(){
                 return checkLoaderStatus(jobId, intervalId);
-            }, 250)
+            }, 500);
         }
     </script>
     <button onclick="downloadLoader()" id="downloadLoaderButton">Download loader</button>

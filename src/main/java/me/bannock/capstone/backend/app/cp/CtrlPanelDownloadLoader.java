@@ -35,10 +35,10 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/app/downloadLoader/")
 @Secured("PRIV_LAUNCH_LOADER")
-public class CtrlDownloadLoader {
+public class CtrlPanelDownloadLoader {
 
     @Autowired
-    public CtrlDownloadLoader(LoaderProtService loaderProtService, UserService userService){
+    public CtrlPanelDownloadLoader(LoaderProtService loaderProtService, UserService userService){
         this.loaderProtService = loaderProtService;
         this.userService = userService;
     }
