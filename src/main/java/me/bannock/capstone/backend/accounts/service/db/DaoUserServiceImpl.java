@@ -56,6 +56,8 @@ public class DaoUserServiceImpl implements UserService {
         Optional<AccountModel> user = userRepo.findAccountModelByEmail(email);
         if (user.isEmpty())
             throw new UserServiceException("Could not find user account that matched email", -1);
+        if (user.get().isDisabled() || !user.get().isEmailVerified())
+            throw new UserServiceException("User account is not active", user.get().getId());
         if (!passwordEncoder.matches(password, user.get().getPassword()))
             throw new UserServiceException("Password is incorrect", user.get().getId());
 
@@ -71,6 +73,8 @@ public class DaoUserServiceImpl implements UserService {
         Optional<AccountModel> user = userRepo.findAccountModelByApiKey(token);
         if (user.isEmpty())
             throw new UserServiceException("Api key does not exist", -1);
+        if (user.get().isDisabled() || !user.get().isEmailVerified())
+            throw new UserServiceException("User account is not active", user.get().getId());
 
         // Double check that the user is allowed to use the api for logins
         if (user.get().getPrivileges().stream().noneMatch(priv -> priv.equals(Privilege.PRIV_USE_API.getPrivilege())))

@@ -1,5 +1,6 @@
 package me.bannock.capstone.backend.accounts.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -25,12 +26,22 @@ public class AccountDTO {
     }
 
     private final long uid;
+
+    @JsonIgnore
     private final Collection<? extends GrantedAuthority> authorities;
+
     private final String email;
+
     private final String username;
+
+    @JsonIgnore
     private final String password;
+
+    @JsonIgnore
     private final String apiKey;
+
     private final String hwid;
+
     private final boolean expired, passwordExpired, locked, disabled;
 
     public long getUid() {

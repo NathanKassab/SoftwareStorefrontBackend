@@ -46,12 +46,16 @@
                 method: "GET"
             });
             if (buildRequest.status !== 202 && buildRequest.status !== 200){ // 202 is accepted
-                updateMessage(buildRequest.status + " " + await buildRequest.text(), true);
+                buildRequest.text().then(text => {
+                    updateMessage(buildRequest.status + " " + text, true);
+                });
                 return;
             }
 
             if (buildRequest.status === 202){
-                updateMessage(buildRequest.text(), false);
+                buildRequest.text().then(text => {
+                    updateMessage(text, false);
+                });
                 return;
             }
 

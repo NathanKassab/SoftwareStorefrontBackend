@@ -63,8 +63,11 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
     @Value("${backend.loader.protService.deleteFilesOnTimeout}")
     private boolean deleteFilesOnTimeout;
 
-    @Value("${backend.loader.authServerIp}")
-    private String authServerIp;
+    @Value("${backend.loader.serverIp}")
+    private String serverIp;
+
+    @Value("${backend.loader.requestProtocol}")
+    private String requestProtocol;
 
     private final Injector obfuscatorInjector;
     private final Obfuscator obfuscator;
@@ -81,8 +84,11 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         // Cache to ensure users don't run a million obfuscation jobs
         if (uidJobCache.containsKey(uid)){
             String cachedId = uidJobCache.get(uid);
-            ObfuscatorJob cachedJob = jobs.get(cachedId);
-            return new LoaderProtJobDto(cachedId, uid, obfuscator.getJobStatus(cachedJob).getFriendlyName(), cachedId);
+            File cachedOutput = getOutputFile(cachedId);
+            if (cachedOutput.exists()){
+                ObfuscatorJob cachedJob = jobs.get(cachedId);
+                return new LoaderProtJobDto(cachedId, uid, obfuscator.getJobStatus(cachedJob).getFriendlyName(), cachedId);
+            }
         }
 
         File configFile = new File(configFilePath);
@@ -113,7 +119,8 @@ public class DonutGuardLoaderProtServiceImpl implements LoaderProtService {
         // we set these specific values in the config
         WatermarkerConfigGroup.API_KEY.setString(config, apiKey);
         WatermarkerConfigGroup.UID.setString(config, uid + "");
-        WatermarkerConfigGroup.AUTH_SERVER_IP.setString(config, authServerIp);
+        WatermarkerConfigGroup.SERVER_IP.setString(config, serverIp);
+        WatermarkerConfigGroup.REQUEST_PROTOCOL.setString(config, requestProtocol);
 
         String jobId = "loader-%s".formatted(System.currentTimeMillis());
         if (this.jobs.containsKey(jobId))
