@@ -43,10 +43,14 @@ public class AccountApiController {
         }
 
         try {
-            if (userService.doesHwidMatch(hwid, user.get().getUid()))
+            if (userService.doesHwidMatch(hwid, user.get().getUid())){
+                logger.info("User logged in, sessionId={}, user={}", request.getSession().getId(), user.get());
                 return ResponseEntity.ok(user.get());
-            else
+            }else{
+                logger.warn("User attempted to login, but their hwid did not match, sessionId={}, hwid={}, user={}",
+                        request.getSession().getId(), hwid, user.get());
                 return ResponseEntity.badRequest().body("HWID does not match");
+            }
         } catch (UserServiceException e) {
             logger.error("Could not check if hwid matches, sessionId={}, hwid={}, uid={}",
                     request.getSession().getId(), hwid, user.get().getUid(), e);

@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
@@ -31,11 +32,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationFailureHandler authFailureHandler(){
-        return new AuthFailureHandler();
-    }
-
-    @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
         CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
         loggingFilter.setIncludeClientInfo(true);
@@ -48,8 +44,8 @@ public class SecurityConfig {
     @Bean
     @Autowired
     public DefaultSecurityFilterChain configureHttp(HttpSecurity security, AuthenticationFailureHandler authFailureHandler,
-                                                    AccessDeniedHandler accessDeniedHandler,
-                                                    UserService userService, UserDetailsService userDetailsService) throws Exception {
+                                                    AccessDeniedHandler accessDeniedHandler, UserService userService,
+                                                    UserDetailsService userDetailsService) throws Exception {
         security.authorizeHttpRequests(authManagerRegistry -> authManagerRegistry.requestMatchers(
                 "/", "/helloWorld", "/logout*", "/register", "/login", "/api/licensing/1/generate/**",
                 "/products/**", "/resources/**"
@@ -67,13 +63,17 @@ public class SecurityConfig {
         security.logout(logoutConfigurer -> logoutConfigurer.logoutUrl("/logout").clearAuthentication(true));
 
         // We assign a custom access denied handler so we could log the failed attempt
-        security.exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler));
+        security.exceptionHandling(exceptionHandlingConfigurer -> {
+            exceptionHandlingConfigurer.accessDeniedHandler(accessDeniedHandler);
+            exceptionHandlingConfigurer.authenticationEntryPoint(new Http403ForbiddenEntryPoint());
+        });
 
         security.csrf(Customizer.withDefaults());
 
         // This authenticates api users who are using the authentication header
         security.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .addFilterBefore(new ApiAuthenticationFilter(userService, userDetailsService), BasicAuthenticationFilter.class);
+
 
         return security.build();
     }

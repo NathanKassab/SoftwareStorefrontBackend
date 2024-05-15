@@ -118,7 +118,8 @@ public class CtrlPanelDownloadLoader {
         Path path = Paths.get(output.get().getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"%s\"".formatted(downloadedLoaderFileName));
+        String userLoaderFileName = downloadedLoaderFileName.formatted(user.get().getUid());
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"%s\"".formatted(userLoaderFileName));
         return ResponseEntity.ok()
                 .contentLength(output.get().length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

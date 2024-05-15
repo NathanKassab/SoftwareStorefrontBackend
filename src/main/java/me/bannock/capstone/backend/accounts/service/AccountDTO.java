@@ -37,7 +37,6 @@ public class AccountDTO {
     @JsonIgnore
     private final String password;
 
-    @JsonIgnore
     private final String apiKey;
 
     private final String hwid;

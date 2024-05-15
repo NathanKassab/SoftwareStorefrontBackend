@@ -21,7 +21,7 @@ public class ProductDTO {
     }
 
     private final long id;
-    private String name, iconUrl, purchaseUrl, description, keygenId;
+    private String name, iconUrl, purchaseUrl, description, keygenId; // TODO: Add version for updates
     private Long ownerUid;
     private boolean disabled, hidden, approved;
     private double price;

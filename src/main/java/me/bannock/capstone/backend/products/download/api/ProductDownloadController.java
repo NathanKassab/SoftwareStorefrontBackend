@@ -18,8 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
@@ -43,9 +43,9 @@ public class ProductDownloadController {
     private final LicenseService licenseService;
     private final ProductDownloadService productDownloadService;
 
-    @GetMapping("")
+    @GetMapping("{productId}")
     public ResponseEntity<?> download(HttpServletRequest request,
-                                      @RequestParam(name = "productId") long productId){
+                                      @PathVariable(name = "productId") long productId){
         Optional<ProductDTO> product;
         try {
             product = productService.getProductDetails(productId);
@@ -75,6 +75,8 @@ public class ProductDownloadController {
         ByteArrayResource resource = new ByteArrayResource(downloadDto.get().getBytes());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"%s\"".formatted(downloadDto.get().getFileName()));
+        logger.info("User has downloaded product, sessionId={}, product={}, user={}",
+                request.getSession().getId(), product.get(), user.get());
         return ResponseEntity.ok()
                 .contentLength(downloadDto.get().getBytes().length)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

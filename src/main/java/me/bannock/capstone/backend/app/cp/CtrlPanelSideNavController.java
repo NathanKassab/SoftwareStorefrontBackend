@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -80,10 +84,13 @@ public class CtrlPanelSideNavController {
 
         // Now that the license has been redeemed, we're also going to
         // add shopper privileges to the user
+        List<GrantedAuthority> authorities = new ArrayList<>(user.getAuthorities());
         Role.ROLE_SHOPPER.getPrivileges().forEach(priv -> {
             if (user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals(priv.getPrivilege()))) {
                 try {
-                    userService.grantPrivilege(user.getUid(), priv.getPrivilege());
+                    String privilege = priv.getPrivilege();
+                    userService.grantPrivilege(user.getUid(), privilege);
+                    authorities.add(new SimpleGrantedAuthority(privilege));
                 } catch (UserServiceException e) {
                     logger.error("Failed to grant privilege to user, error={}, uid={}", e, user.getUid());
                 }
@@ -92,7 +99,7 @@ public class CtrlPanelSideNavController {
 
         // Refreshes privs on app without the need to relog
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), user.getAuthorities());
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         if (user.getApiKey() == null) {
