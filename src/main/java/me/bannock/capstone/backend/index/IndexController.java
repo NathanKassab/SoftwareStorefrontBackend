@@ -27,9 +27,9 @@ public class IndexController {
 
     private final UserService userService;
 
-    @GetMapping("helloWorld")
-    public String helloWorld(){
-        return "helloWorld";
+    @GetMapping("")
+    public void helloWorld(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/login");
     }
 
     @GetMapping("login")
